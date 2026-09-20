@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ananas TCG Card Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0b0a14;
+    --bg-1:#141225;
+    --bg-2:#1c1a33;
+    --panel:#191730;
+    --line:rgba(255,255,255,0.08);
+    --text:#f2eefc;
+    --text-dim:#a79fc4;
+    --anime:#ff4d8d;
+    --jv:#37cfff;
+    --meme:#ffd23f;
+    --r1:#8b87a6;
+    --r2:#3ddc84;
+    --r3:#37b6ff;
+    --r4:#b06bff;
+    --r5:#ffb020;
+    --r6:#ff3b5c;
+    --r7:#00e5ff;
+    --gold:#ffd23f;
+    --font-display:'Bungee', 'Arial Black', sans-serif;
+    --font-body:'Space Grotesk', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(255,77,141,0.16) 0%, transparent 45%),
+      radial-gradient(ellipse at 90% 0%, rgba(55,207,255,0.14) 0%, transparent 40%),
+      var(--bg-0);
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:8px;}
+
+  .app{max-width:960px;margin:0 auto;padding:14px 14px 90px;}
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;border-radius:18px;
+    background:linear-gradient(135deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--line);
+    margin-bottom:14px;
+    flex-wrap:wrap;gap:10px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{font-size:26px;}
+  .brand h1{
+    font-family:var(--font-display);
+    font-size:17px;letter-spacing:0.5px;margin:0;
+    background:linear-gradient(90deg, var(--anime), var(--jv) 55%, var(--meme));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .resources{display:flex;gap:8px;}
+  .resource-pill{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--line);
+    padding:6px 12px;border-radius:999px;
+    font-weight:600;font-size:13.5px;white-space:nowrap;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    display:flex;gap:6px;overflow-x:auto;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:16px;padding:6px;margin-bottom:16px;
+  }
+  .nav button{
+    flex:1;min-width:88px;
+    background:transparent;border:none;color:var(--text-dim);
+    padding:10px 8px;border-radius:11px;font-family:var(--font-body);
+    font-weight:600;font-size:13px;cursor:pointer;transition:all .15s ease;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+  }
+  .nav button .ic{font-size:17px;}
+  .nav button.active{background:linear-gradient(135deg, rgba(255,77,141,0.22), rgba(55,207,255,0.18));color:var(--text);}
+  .nav button:hover:not(.active){background:rgba(255,255,255,0.05);color:var(--text);}
+
+  /* ---------- PANELS ---------- */
+  .tab{display:none;animation:fadeIn .25s ease;}
+  .tab.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:20px;padding:20px;margin-bottom:16px;
+  }
+  .panel h2{
+    font-family:var(--font-display);font-size:15px;margin:0 0 14px;
+    letter-spacing:0.3px;font-weight:400;
+  }
+  .panel h3{font-size:14px;color:var(--text-dim);margin:20px 0 10px;font-weight:700;}
+
+  /* ---------- TAG SELECTOR ---------- */
+  .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tag-btn{
+    border:1.5px solid var(--line);background:rgba(255,255,255,0.03);
+    color:var(--text-dim);padding:9px 15px;border-radius:12px;
+    font-family:var(--font-body);font-weight:600;font-size:13px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;transition:all .15s;
+  }
+  .tag-btn.active{color:#0b0a14;border-color:transparent;}
+
+  /* ---------- DROP RATES ---------- */
+  .drop-rates{
+    background:rgba(0,0,0,0.25);border-radius:14px;padding:12px 16px;
+    margin-bottom:16px;font-size:13px;color:var(--text-dim);
+  }
+  .drop-rates .title{color:var(--text);font-weight:700;margin-bottom:8px;font-size:13px;}
+  .drop-rates .row{display:flex;justify-content:space-between;padding:2px 0;}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    font-family:var(--font-body);font-weight:700;font-size:14px;
+    border:none;border-radius:14px;padding:14px 18px;cursor:pointer;
+    color:#0b0a14;background:linear-gradient(135deg,var(--anime),var(--jv));
+    width:100%;transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(0.98);}
+  .btn.secondary{background:rgba(255,255,255,0.08);color:var(--text);border:1px solid var(--line);}
+  .btn.gold{background:linear-gradient(135deg,var(--gold),#ff8a3c);}
+  .btn.danger{background:linear-gradient(135deg,#ff3b5c,#c2255c);color:#fff;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;filter:none;}
+  .btn.small{width:auto;padding:9px 14px;font-size:12.5px;border-radius:10px;}
+
+  #cooldownLabel{text-align:center;color:var(--text-dim);font-size:13px;margin-top:10px;min-height:18px;}
+  .booster-option{
+    background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-top:14px;
+  }
+  .booster-option h3{margin:0 0 4px;font-size:14px;color:var(--text);font-weight:700;}
+  .booster-desc{font-size:12px;color:var(--text-dim);margin:0 0 12px;}
+  .cooldown-label{text-align:center;color:var(--text-dim);font-size:12.5px;margin-top:8px;min-height:16px;}
+
+  /* ---------- PITY ---------- */
+  .pity-block{margin-top:16px;}
+  .pity-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+  .pity-bar-bg{height:8px;border-radius:99px;background:rgba(255,255,255,0.08);overflow:hidden;}
+  .pity-bar-fill{height:100%;border-radius:99px;transition:width .3s;}
+  .pity-sub{font-size:11.5px;color:var(--text-dim);margin-top:6px;}
+
+  /* ---------- CARD GRID ---------- */
+  .cards-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:12px;margin-top:14px;
+  }
+  .card{
+    position:relative;border-radius:14px;padding:10px 8px 12px;
+    background:linear-gradient(160deg, var(--bg-2), var(--bg-1));
+    border:1.5px solid var(--r1);text-align:center;
+    display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  .card.locked{opacity:0.35;filter:grayscale(0.6);}
+  .card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px;}
+  .card-placeholder{
+    width:100%;aspect-ratio:3/4;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;font-size:34px;
+    background:rgba(255,255,255,0.05);
+  }
+  .card .cname{font-size:12px;font-weight:700;line-height:1.2;min-height:28px;}
+  .card .cstars{font-size:11px;letter-spacing:1px;}
+  .card .ccopies{font-size:10.5px;color:var(--text-dim);}
+  .card .cseries-tag{
+    position:absolute;top:6px;left:6px;font-size:13px;
+    background:rgba(0,0,0,0.45);border-radius:7px;padding:2px 5px;
+  }
+  .card.rarity-1{border-color:var(--r1);}
+  .card.rarity-2{border-color:var(--r2);box-shadow:0 0 14px rgba(61,220,132,0.15);}
+  .card.rarity-3{border-color:var(--r3);box-shadow:0 0 14px rgba(55,182,255,0.18);}
+  .card.rarity-4{border-color:var(--r4);box-shadow:0 0 16px rgba(176,107,255,0.25);}
+  .card.rarity-5{border-color:var(--r5);box-shadow:0 0 18px rgba(255,176,32,0.3);}
+  .card.rarity-6{border-color:var(--r6);box-shadow:0 0 20px rgba(255,59,92,0.35);}
+  .card.rarity-7{border-color:var(--r7);box-shadow:0 0 24px rgba(0,229,255,0.4);}
+  .card.holo{position:relative;overflow:hidden;}
+  .card.holo::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.35) 35%, rgba(0,229,255,0.25) 45%, transparent 60%);
+    background-size:250% 250%;animation:holoShift 3.5s linear infinite;mix-blend-mode:screen;
+  }
+  @keyframes holoShift{0%{background-position:0% 0%;}100%{background-position:100% 100%;}}
+
+  /* ---------- COLLECTION FILTER ---------- */
+  .collection-tools{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:8px;}
+  .collection-progress{font-size:12.5px;color:var(--text-dim);}
+
+  /* ---------- SHOP ---------- */
+  .shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:6px;}
+  .shop-item{
+    background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:16px;
+    padding:16px;text-align:center;
+  }
+  .shop-item .icon{font-size:30px;margin-bottom:6px;}
+  .shop-item .title{font-weight:700;font-size:14px;margin-bottom:4px;}
+  .shop-item .desc{font-size:12px;color:var(--text-dim);margin-bottom:12px;min-height:30px;}
+
+  .missing-card{
+    background:rgba(255,255,255,0.04);border:1.5px dashed var(--line);border-radius:14px;
+    padding:10px;text-align:center;
+  }
+  .missing-card .price{font-size:11.5px;color:var(--text-dim);margin:6px 0;}
+
+  /* ---------- QUESTS ---------- */
+  .quest-card{
+    background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:14px;
+    padding:14px;margin-bottom:10px;
+  }
+  .quest-card.complete{border-color:var(--r2);}
+  .quest-card.claimed{opacity:0.5;}
+  .quest-title{font-weight:700;font-size:14px;margin-bottom:2px;}
+  .quest-desc{font-size:12px;color:var(--text-dim);margin-bottom:8px;}
+  .quest-progress-bar{height:7px;border-radius:99px;background:rgba(255,255,255,0.08);overflow:hidden;margin-bottom:8px;}
+  .quest-progress-fill{height:100%;background:var(--r2);border-radius:99px;transition:width .3s;}
+  .quest-status-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:8px;}
+
+  /* ---------- ADMIN ---------- */
+  .admin-form{display:flex;flex-direction:column;gap:10px;}
+  .admin-form label{font-size:12.5px;color:var(--text-dim);font-weight:600;}
+  .admin-form input[type=text], .admin-form select, .admin-form input[type=number]{
+    width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);
+    background:rgba(255,255,255,0.05);color:var(--text);font-family:var(--font-body);font-size:14px;
+  }
+  .admin-form input[type=file]{color:var(--text-dim);font-size:12.5px;}
+  .rarity-picker{display:flex;gap:6px;flex-wrap:wrap;}
+  .rarity-chip{
+    border:1.5px solid var(--line);background:rgba(255,255,255,0.03);
+    padding:7px 10px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text-dim);
+  }
+  .rarity-chip.active{color:#0b0a14;border-color:transparent;}
+  .rarity-chip[data-r="1"].active{background:var(--r1);}
+  .rarity-chip[data-r="2"].active{background:var(--r2);}
+  .rarity-chip[data-r="3"].active{background:var(--r3);}
+  .rarity-chip[data-r="4"].active{background:var(--r4);}
+  .rarity-chip[data-r="5"].active{background:var(--r5);}
+  .rarity-chip[data-r="6"].active{background:var(--r6);}
+  .rarity-chip[data-r="7"].active{background:var(--r7);}
+  .tag-chip{
+    border:1.5px solid var(--line);background:rgba(255,255,255,0.03);
+    padding:7px 10px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text-dim);
+  }
+  .tag-chip.active{color:#0b0a14;border-color:transparent;}
+  .admin-preview{width:90px;aspect-ratio:3/4;border-radius:10px;object-fit:cover;background:rgba(255,255,255,0.05);}
+  .admin-list{margin-top:18px;display:flex;flex-direction:column;gap:8px;}
+  .card-tag-badge{
+    display:inline-block;font-size:10px;font-weight:700;border-radius:6px;
+    padding:1px 6px;margin:3px 4px 0 0;
+  }
+  .admin-row{
+    display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);border-radius:12px;padding:8px 10px;
+  }
+  .admin-row img, .admin-row .ph{width:36px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .admin-row .info{flex:1;min-width:0;}
+  .admin-row .info .n{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .admin-row .info .m{font-size:11px;color:var(--text-dim);}
+  .admin-row .actions{display:flex;gap:6px;}
+  .icon-btn{
+    background:rgba(255,255,255,0.06);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;
+  }
+  .icon-btn.del{color:#ff8a9b;}
+  .danger-zone{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);}
+
+  .empty-state{text-align:center;color:var(--text-dim);font-size:13px;padding:24px 10px;}
+
+  /* ---------- BOOSTER REVEAL ---------- */
+  #boosterStage{margin-top:18px;}
+  .reveal-counter{text-align:center;font-size:12.5px;color:var(--text-dim);margin-bottom:10px;}
+  .reveal-wrap{display:flex;justify-content:center;perspective:1200px;margin-bottom:14px;}
+  .flip-card{
+    width:170px;height:230px;position:relative;transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1);cursor:pointer;
+  }
+  .flip-card.flipped{transform:rotateY(180deg);}
+  .flip-face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:2px solid var(--line);overflow:hidden;padding:10px;text-align:center;gap:6px;
+  }
+  .flip-front{background:linear-gradient(135deg,#241f3f,#171331);font-size:44px;color:rgba(255,255,255,0.5);}
+  .flip-back{transform:rotateY(180deg);background:linear-gradient(160deg,var(--bg-2),var(--bg-1));}
+  .flip-back img{width:100%;flex:1;object-fit:cover;border-radius:10px;min-height:0;}
+  .flip-back .ph{width:100%;flex:1;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:32px;}
+  .flip-back .fname{font-size:12.5px;font-weight:700;}
+  .flip-back .fstars{font-size:11px;}
+  .new-tag{position:absolute;top:8px;right:8px;background:var(--r2);color:#0b0a14;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;}
+  .reveal-nav{display:flex;justify-content:center;gap:10px;margin-bottom:6px;}
+  .reveal-hint{text-align:center;font-size:11.5px;color:var(--text-dim);}
+  .recap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:16px;}
+
+  /* ---------- EPIC OVERLAY ---------- */
+  .epic-overlay{
+    position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s ease;
+  }
+  .epic-overlay.show{opacity:1;pointer-events:auto;}
+  .epic-particles{position:absolute;inset:0;overflow:hidden;}
+  .epic-particle{position:absolute;border-radius:50%;animation:particleBurst ease-out forwards;}
+  @keyframes particleBurst{
+    from{transform:translate(-50%,-50%) translate(0,0);opacity:1;}
+    to{transform:translate(-50%,-50%) translate(var(--tx),var(--ty));opacity:0;}
+  }
+  .epic-card{position:relative;z-index:2;text-align:center;transform:scale(0.5);opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1), opacity .5s ease;}
+  .epic-card.reveal{transform:scale(1);opacity:1;}
+  .epic-card img{width:210px;aspect-ratio:3/4;object-fit:cover;border-radius:18px;}
+  .epic-card .ph{width:210px;aspect-ratio:3/4;border-radius:18px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:60px;}
+  .epic-label{font-family:var(--font-display);font-size:20px;margin-bottom:14px;}
+  .epic-name{font-weight:700;font-size:16px;margin-top:10px;}
+  .epic-stars{font-size:14px;margin-top:4px;}
+  .epic-tap{position:absolute;bottom:24px;font-size:12px;color:var(--text-dim);}
+
+  /* ---------- TOAST ---------- */
+  #toastHost{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;padding:0 14px;}
+  .toast{
+    background:rgba(20,18,37,0.95);border:1px solid var(--line);color:var(--text);
+    padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:toastIn .25s ease;max-width:420px;text-align:center;
+  }
+  @keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  @media (max-width:480px){
+    .nav button{font-size:11px;min-width:70px;}
+    .flip-card{width:150px;height:200px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🍍</span>
+      <h1>ANANAS TCG CARD GAME</h1>
+    </div>
+    <div class="resources">
+      <div class="resource-pill" id="crystalDisplay">💎 0</div>
+      <div class="resource-pill" id="pieceDisplay">🪙 0</div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button data-tab="booster" class="active"><span class="ic">🎁</span>Booster</button>
+    <button data-tab="collection"><span class="ic">📚</span>Collection</button>
+    <button data-tab="shop"><span class="ic">💎</span>Boutique</button>
+    <button data-tab="quests"><span class="ic">🎯</span>Quêtes</button>
+    <button data-tab="settings"><span class="ic">⚙️</span>Paramètres</button>
+  </nav>
+
+  <main>
+
+    <!-- ===================== BOOSTER ===================== -->
+    <section id="booster" class="tab active">
+      <div class="panel">
+        <h2>Ouvrir un booster</h2>
+        <div class="drop-rates">
+          <div class="title">Taux de drop</div>
+          <div class="row"><span>⭐ Commune</span><span>44.9%</span></div>
+          <div class="row"><span>⭐⭐ Peu commune</span><span>25%</span></div>
+          <div class="row"><span>⭐⭐⭐ Rare</span><span>15%</span></div>
+          <div class="row"><span>⭐⭐⭐⭐ Épique</span><span>10%</span></div>
+          <div class="row"><span>⭐⭐⭐⭐⭐ Légendaire</span><span>4%</span></div>
+          <div class="row"><span>⭐⭐⭐⭐⭐⭐ Secrète</span><span>1%</span></div>
+          <div class="row"><span>💎 Diamant</span><span>0.1%</span></div>
+        </div>
+
+        <div class="booster-option">
+          <h3 style="margin-top:0;">🎁 Booster classique</h3>
+          <p class="booster-desc">Cartes de tous types confondus. Gratuit, recharge rapide.</p>
+          <button class="btn" id="openClassicBtn">Ouvrir (6 cartes)</button>
+          <div class="cooldown-label" id="classicCooldownLabel"></div>
+        </div>
+
+        <div class="booster-option">
+          <h3>🎯 Booster spécialisé</h3>
+          <p class="booster-desc">Cartes d'un seul type au choix. Gratuit, mais recharge plus lentement que le classique.</p>
+          <div class="tag-row" id="specializedTagSelector"></div>
+          <button class="btn secondary" id="openSpecializedBtn">Ouvrir (6 cartes) — <span id="specializedCostLabel"></span></button>
+          <div class="cooldown-label" id="specializedCooldownLabel"></div>
+        </div>
+
+        <div id="pityDisplay"></div>
+        <div id="boosterStage"></div>
+      </div>
+    </section>
+
+    <!-- ===================== COLLECTION ===================== -->
+    <section id="collection" class="tab">
+      <div class="panel">
+        <h2>Collection</h2>
+        <div class="tag-row" id="collectionTagSelector"></div>
+        <div class="collection-tools">
+          <div class="collection-progress" id="collectionProgress"></div>
+          <button class="btn secondary small" id="recycleAllBtn">♻️ Recycler tous les doublons</button>
+        </div>
+        <div id="collectionList" class="cards-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===================== SHOP ===================== -->
+    <section id="shop" class="tab">
+      <div class="panel">
+        <h2>Boutique</h2>
+        <div class="shop-grid">
+          <div class="shop-item">
+            <div class="icon">📦</div>
+            <div class="title">Booster standard</div>
+            <div class="desc">6 cartes, taux normal</div>
+            <button class="btn small" id="buyBoosterCrystalBtn" style="width:100%">140 💎</button>
+          </div>
+          <div class="shop-item">
+            <div class="icon">🌟</div>
+            <div class="title">Booster doré</div>
+            <div class="desc">3 cartes rareté 5+ garanties</div>
+            <button class="btn gold small" id="buyGoldenBtn" style="width:100%">1200 💎</button>
+          </div>
+          <div class="shop-item">
+            <div class="icon">🪙</div>
+            <div class="title">Booster à pièces</div>
+            <div class="desc">6 cartes, taux normal</div>
+            <button class="btn secondary small" id="buyPieceBoosterBtn" style="width:100%">25 🪙</button>
+          </div>
+        </div>
+        <h3>📚 Cartes manquantes</h3>
+        <div id="shopMissingList" class="cards-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===================== QUESTS ===================== -->
+    <section id="quests" class="tab">
+      <div class="panel">
+        <h2>Quêtes quotidiennes</h2>
+        <div id="questsList"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ADMIN ===================== -->
+    <section id="settings" class="tab">
+      <div class="panel">
+        <h2>Paramètres</h2>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">La gestion des tags et des cartes est réservée à l'administrateur du site.</p>
+
+        <div id="adminLogin">
+          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Accès réservé. Connecte-toi pour gérer les tags et les cartes.</p>
+          <form class="admin-form" id="adminLoginForm">
+            <div>
+              <label>Identifiant</label>
+              <input type="text" id="al_id" autocomplete="off" spellcheck="false" required>
+            </div>
+            <div>
+              <label>Mot de passe</label>
+              <input type="password" id="al_pass" autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn">Se connecter</button>
+            <div id="al_error" style="color:#ff8a9b;font-size:12.5px;display:none;">Identifiant ou mot de passe incorrect.</div>
+          </form>
+        </div>
+
+        <div id="adminContent" style="display:none;">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+          <button class="icon-btn" id="adminLogoutBtn" type="button">🔓 Se déconnecter</button>
+        </div>
+
+        <h3 style="margin-top:0;">💾 Sauvegarde</h3>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:12px;">Les images que tu ajoutes restent dans ton navigateur — les autres joueurs ne les voient pas automatiquement. Exporte un fichier avec toutes tes cartes et tags (images incluses) pour les transférer ou les intégrer au site pour tout le monde.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          <button class="btn secondary small" id="exportDataBtn" type="button">⬇️ Exporter (JSON)</button>
+          <label class="btn secondary small" style="cursor:pointer;text-align:center;margin:0;">
+            ⬆️ Importer un fichier
+            <input type="file" id="importDataInput" accept="application/json" style="display:none;">
+          </label>
+        </div>
+
+        <h3 style="margin-top:0;">🏷️ Tags</h3>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:12px;">Une carte peut porter plusieurs tags, un seul, ou aucun. Supprimer un tag le retire des cartes concernées, sans supprimer les cartes elles-mêmes.</p>
+        <form class="admin-form" id="tagForm">
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+            <div style="flex:2;min-width:120px;">
+              <label>Nom du tag</label>
+              <input type="text" id="tf_label" placeholder="Ex: Films" required>
+            </div>
+            <div style="flex:1;min-width:70px;">
+              <label>Emoji</label>
+              <input type="text" id="tf_emoji" placeholder="🎬" maxlength="4">
+            </div>
+            <div style="flex:1;min-width:70px;">
+              <label>Couleur</label>
+              <input type="color" id="tf_color" value="#37cfff" style="padding:4px;height:44px;">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="submit" class="btn secondary" id="tf_submitBtn">Ajouter le tag</button>
+            <button type="button" class="btn secondary" id="tf_cancelBtn" style="display:none;">Annuler</button>
+          </div>
+        </form>
+        <div class="admin-list" id="tagList" style="margin-top:14px;"></div>
+
+        <h3>🃏 Cartes</h3>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Ajoute, modifie ou supprime des cartes. Les images sont enregistrées localement dans ton navigateur.</p>
+        <form class="admin-form" id="adminForm">
+          <div>
+            <label>Nom de la carte</label>
+            <input type="text" id="af_name" placeholder="Ex: Le Sceau Ultime" required>
+          </div>
+          <div>
+            <label>Tags (optionnel, plusieurs possibles)</label>
+            <div class="rarity-picker" id="af_tagsPicker"></div>
+          </div>
+          <div>
+            <label>Rareté</label>
+            <div class="rarity-picker" id="af_rarityPicker">
+              <div class="rarity-chip" data-r="1">⭐1</div>
+              <div class="rarity-chip" data-r="2">⭐2</div>
+              <div class="rarity-chip" data-r="3">⭐3</div>
+              <div class="rarity-chip" data-r="4">⭐4</div>
+              <div class="rarity-chip" data-r="5">⭐5</div>
+              <div class="rarity-chip" data-r="6">⭐6</div>
+              <div class="rarity-chip" data-r="7">💎7</div>
+            </div>
+          </div>
+          <div>
+            <label>Image (fichier local, recommandé)</label>
+            <input type="file" id="af_file" accept="image/*">
+          </div>
+          <div>
+            <label>ou URL d'image (optionnel)</label>
+            <input type="text" id="af_url" placeholder="https://...">
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <img id="af_preview" class="admin-preview" style="display:none;">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="submit" class="btn" id="af_submitBtn">Ajouter la carte</button>
+            <button type="button" class="btn secondary" id="af_cancelBtn" style="display:none;">Annuler</button>
+          </div>
+        </form>
+
+        <h3>Cartes existantes (<span id="adminCount">0</span>)</h3>
+        <div class="admin-list" id="adminList"></div>
+
+        <div class="danger-zone">
+          <h3 style="color:#ff8a9b;">⚠️ Zone dangereuse</h3>
+          <button class="btn danger small" id="resetCollectionBtn">Réinitialiser la collection</button>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="epicOverlay" class="epic-overlay">
+  <div class="epic-particles" id="epicParticles"></div>
+  <div class="epic-label" id="epicLabel"></div>
+  <div class="epic-card" id="epicCard">
+    <div id="epicImgHolder"></div>
+    <div class="epic-name" id="epicName"></div>
+    <div class="epic-stars" id="epicStars"></div>
+  </div>
+  <div class="epic-tap">Touche l'écran pour continuer</div>
+</div>
+
+<div id="toastHost"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================
+   CONFIG
+===================================================== */
+const NS = "anansTcg_";
+const DEFAULT_TAGS = [
+  { id:"anime",     label:"Anime",       emoji:"🎌", hex:"#ff4d8d" },
+  { id:"jeuxvideo", label:"Jeux Vidéo",  emoji:"🎮", hex:"#37cfff" },
+  { id:"meme",      label:"Meme",        emoji:"😂", hex:"#ffd23f" }
+];
+const RARITY_LABEL = {1:"Commune",2:"Peu commune",3:"Rare",4:"Épique",5:"Légendaire",6:"Secrète",7:"Diamant"};
+const DROP_RATES = [
+  {rarity:1,chance:44.9},{rarity:2,chance:25},{rarity:3,chance:15},
+  {rarity:4,chance:10},{rarity:5,chance:4},{rarity:6,chance:1},{rarity:7,chance:0.1}
+];
+const RECYCLE_YIELD = {1:6,2:12,3:24,4:50,5:90,6:160,7:260};
+const SHOP_CARD_COST = {1:180,2:420,3:840,4:1560,5:2880,6:5280,7:9600};
+const CLASSIC_COOLDOWN_MS = 30000;
+const SPECIALIZED_COOLDOWN_MS = 45000;
+const BOOSTER_CRYSTAL_COST = 140;
+const GOLDEN_CRYSTAL_COST = 1200;
+const PIECE_BOOSTER_COST = 25;
+const PITY_THRESHOLD = 100;
+const DAILY_QUESTS = [
+  {id:"open_booster", title:"Ouvre un booster", desc:"Ouvre un booster aujourd'hui", target:1, reward:20, tracker:"boostersOpened"},
+  {id:"recycle", title:"Recycle un doublon", desc:"Recycle au moins un doublon", target:1, reward:15, tracker:"duplicatesRecycled"},
+  {id:"find_rare", title:"Trouve une carte rare", desc:"Obtiens une carte Rare (⭐⭐⭐) ou mieux", target:1, reward:25, tracker:"raresFound"}
+];
+
+const DEFAULT_CARDS = [
+  {id:1,name:"Éveil du Héros",tags:["anime"],rarity:1,image:null},
+  {id:2,name:"Chibi Comique",tags:["anime"],rarity:1,image:null},
+  {id:3,name:"Sensei Bavard",tags:["anime"],rarity:1,image:null},
+  {id:4,name:"Combattante Déterminée",tags:["anime"],rarity:2,image:null},
+  {id:5,name:"Rival Masqué",tags:["anime"],rarity:3,image:null},
+  {id:6,name:"Garde du Sanctuaire",tags:["anime"],rarity:4,image:null},
+  {id:7,name:"Dragon Ancestral",tags:["anime"],rarity:5,image:null},
+  {id:8,name:"Avatar Céleste",tags:["anime"],rarity:6,image:null},
+  {id:9,name:"Le Sceau Ultime",tags:["anime"],rarity:7,image:null},
+  {id:10,name:"Slime Débutant",tags:["jeuxvideo"],rarity:1,image:null},
+  {id:11,name:"Pixel Perdu",tags:["jeuxvideo"],rarity:1,image:null},
+  {id:12,name:"Coffre Vide",tags:["jeuxvideo"],rarity:1,image:null},
+  {id:13,name:"Chevalier NPC",tags:["jeuxvideo"],rarity:2,image:null},
+  {id:14,name:"Boss de Mi-Parcours",tags:["jeuxvideo"],rarity:3,image:null},
+  {id:15,name:"Speedrunner Fou",tags:["jeuxvideo"],rarity:4,image:null},
+  {id:16,name:"Glitch Légendaire",tags:["jeuxvideo"],rarity:5,image:null},
+  {id:17,name:"Easter Egg Secret",tags:["jeuxvideo"],rarity:6,image:null},
+  {id:18,name:"Game Over Final",tags:["jeuxvideo"],rarity:7,image:null},
+  {id:19,name:"Chat qui Attend",tags:["meme"],rarity:1,image:null},
+  {id:20,name:"Doge Classique",tags:["meme"],rarity:1,image:null},
+  {id:21,name:"Rage Comic",tags:["meme"],rarity:1,image:null},
+  {id:22,name:"Stonks Man",tags:["meme"],rarity:2,image:null},
+  {id:23,name:"This is Fine",tags:["meme"],rarity:3,image:null},
+  {id:24,name:"Distracted Boyfriend",tags:["meme"],rarity:4,image:null},
+  {id:25,name:"Galaxy Brain",tags:["meme"],rarity:5,image:null},
+  {id:26,name:"Le Sigma",tags:["meme"],rarity:6,image:null},
+  {id:27,name:"Meme Ultime Rare",tags:["meme"],rarity:7,image:null}
+];
+
+/* =====================================================
+   STATE
+===================================================== */
+function loadJSON(key, fallback){
+  try{
+    let raw = localStorage.getItem(NS+key);
+    if(raw === null) return fallback;
+    return JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+function saveJSON(key, value){
+  try{ localStorage.setItem(NS+key, JSON.stringify(value)); }catch(e){ toast("⚠️ Stockage plein : impossible d'enregistrer."); }
+}
+
+// Mêmes garanties de persistance que pour les cartes : les tags ne sont
+// initialisés avec les 3 tags par défaut qu'à la toute première visite.
+// Le système est un système de TAGS : une carte peut porter zéro, un ou
+// plusieurs tags (contrairement à l'ancien système de types, où une carte
+// n'appartenait qu'à un seul type).
+let TAGS = loadJSON("series", null);
+if(TAGS === null || !Array.isArray(TAGS)){
+  TAGS = DEFAULT_TAGS.slice();
+  saveJSON("series", TAGS);
+}
+function saveTags(){ saveJSON("series", TAGS); }
+function slugifyTagId(label){
+  let base = label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/(^-+|-+$)/g,"");
+  if(!base) base = "tag";
+  let id = base, n = 2;
+  while(TAGS.some(t=>t.id===id)){ id = base + "-" + n; n++; }
+  return id;
+}
+
+// Les cartes et tags de l'utilisateur sont stockées dans le localStorage du
+// navigateur, séparément du code du site. Une mise à jour du site (nouveau
+// fichier publié) ne réinitialise JAMAIS ces données : on ne charge les
+// cartes par défaut que si la clé "cards" n'a encore JAMAIS été enregistrée
+// (première visite). Si l'utilisateur vide sa collection de cartes
+// volontairement, elle reste vide — elle n'est pas re-remplie automatiquement.
+let cardsDB = loadJSON("cards", null);
+if(cardsDB === null || !Array.isArray(cardsDB)){
+  cardsDB = DEFAULT_CARDS.slice();
+  saveJSON("cards", cardsDB);
+} else {
+  // Migration : les anciennes cartes stockaient un seul "series" (string).
+  // On les convertit en tableau "tags" sans perdre l'information.
+  let migrated = false;
+  cardsDB.forEach(c=>{
+    if(!Array.isArray(c.tags)){
+      c.tags = (typeof c.series === "string" && c.series) ? [c.series] : [];
+      migrated = true;
+    }
+  });
+  if(migrated) saveJSON("cards", cardsDB);
+}
+let collection = loadJSON("collection", {});
+let crystals = Number(localStorage.getItem(NS+"crystals")) || 300;
+let pieces = Number(localStorage.getItem(NS+"pieces")) || 0;
+let lastClassicOpen = Number(localStorage.getItem(NS+"lastBoosterOpen")) || 0;
+let lastSpecializedOpen = Number(localStorage.getItem(NS+"lastSpecializedOpen")) || 0;
+let pityCounter = Number(localStorage.getItem(NS+"pityCounter")) || 0;
+let currentTag = localStorage.getItem(NS+"currentSeries") || (TAGS[0] ? TAGS[0].id : null);
+if(currentTag === "all" || (currentTag && !TAGS.some(t=>t.id===currentTag))){
+  currentTag = TAGS[0] ? TAGS[0].id : null;
+  localStorage.setItem(NS+"currentSeries", currentTag || "");
+}
+let collectionTagView = localStorage.getItem(NS+"collectionSeriesView") || "all";
+if(collectionTagView !== "all" && !TAGS.some(t=>t.id===collectionTagView)){
+  collectionTagView = "all";
+  localStorage.setItem(NS+"collectionSeriesView", collectionTagView);
+}
+let questState = loadQuestState();
+let editingCardId = null;
+
+function saveCrystals(){ localStorage.setItem(NS+"crystals", crystals); }
+function savePieces(){ localStorage.setItem(NS+"pieces", pieces); }
+function saveCollection(){ saveJSON("collection", collection); }
+function saveCardsDB(){ saveJSON("cards", cardsDB); }
+function savePity(){ localStorage.setItem(NS+"pityCounter", pityCounter); }
+
+function getTodayKey(){ return new Date().toISOString().slice(0,10); }
+function loadQuestState(){
+  let s = loadJSON("questState", null);
+  if(!s || s.date !== getTodayKey()){
+    return { date:getTodayKey(), trackers:{boostersOpened:0,duplicatesRecycled:0,raresFound:0}, claimed:{} };
+  }
+  s.trackers = s.trackers || {boostersOpened:0,duplicatesRecycled:0,raresFound:0};
+  s.claimed = s.claimed || {};
+  return s;
+}
+function saveQuestState(){ saveJSON("questState", questState); }
+function bumpQuest(tracker, amount){
+  questState.trackers[tracker] = (questState.trackers[tracker]||0) + amount;
+  saveQuestState();
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
+function toast(msg){
+  let host = document.getElementById("toastHost");
+  let el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .3s"; setTimeout(()=>el.remove(), 300); }, 2400);
+}
+
+/* =====================================================
+   HELPERS
+===================================================== */
+function tagInfo(id){ return TAGS.find(t=>t.id===id) || null; }
+function cardPlaceholderEmoji(card){
+  if(Array.isArray(card.tags) && card.tags.length){
+    for(let tid of card.tags){
+      let t = tagInfo(tid);
+      if(t) return t.emoji;
+    }
+  }
+  return "🃏";
+}
+function starsDisplay(rarity){ return rarity === 7 ? "💎 DIAMANT" : "⭐".repeat(rarity) + " " + RARITY_LABEL[rarity]; }
+function starsShort(rarity){ return rarity === 7 ? "💎" : "⭐".repeat(rarity); }
+function nextCardId(){ return cardsDB.reduce((m,c)=>Math.max(m,c.id),0) + 1; }
+function findCard(id){ return cardsDB.find(c=>c.id===id); }
+function updateResourceDisplay(){
+  document.getElementById("crystalDisplay").textContent = "💎 " + crystals;
+  document.getElementById("pieceDisplay").textContent = "🪙 " + pieces;
+}
+function addCrystals(n){ crystals = Math.max(0, crystals+n); saveCrystals(); updateResourceDisplay(); }
+function spendCrystals(n){ if(n>crystals) return false; crystals-=n; saveCrystals(); updateResourceDisplay(); return true; }
+function addPieces(n){ pieces = Math.max(0, pieces+n); savePieces(); updateResourceDisplay(); }
+function spendPieces(n){ if(n>pieces) return false; pieces-=n; savePieces(); updateResourceDisplay(); return true; }
+
+function cardImageEl(card, cls){
+  if(card.image){
+    let img = document.createElement("img");
+    img.src = card.image;
+    if(cls) img.className = cls;
+    return img;
+  }
+  let ph = document.createElement("div");
+  ph.className = "card-placeholder" + (cls ? " "+cls : "");
+  ph.textContent = cardPlaceholderEmoji(card);
+  return ph;
+}
+
+/* =====================================================
+   TABS
+===================================================== */
+document.querySelectorAll(".nav button").forEach(btn=>{
+  btn.addEventListener("click", ()=> showTab(btn.dataset.tab));
+});
+function showTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active", b.dataset.tab===id));
+  document.getElementById(id).classList.add("active");
+  if(id==="collection") renderCollection();
+  if(id==="shop") renderShop();
+  if(id==="quests") renderQuests();
+  if(id==="settings") showAdminGate();
+}
+
+/* =====================================================
+   TAG SELECTORS
+===================================================== */
+function buildTagRow(container, selected, onPick, withAll){
+  container.innerHTML = "";
+  if(TAGS.length===0){
+    let empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.style.padding = "10px 0";
+    empty.textContent = "Aucun tag disponible. Crée-en un dans Paramètres.";
+    container.appendChild(empty);
+    return;
+  }
+  let list = withAll ? [{id:"all",label:"Tous",emoji:"🃏",hex:null}, ...TAGS] : TAGS;
+  list.forEach(t=>{
+    let b = document.createElement("button");
+    b.className = "tag-btn" + (selected===t.id ? " active" : "");
+    b.dataset.tag = t.id;
+    b.innerHTML = (t.emoji||"") + " " + t.label;
+    if(selected===t.id){
+      b.style.background = t.id==="all" ? "linear-gradient(90deg,var(--anime),var(--jv),var(--meme))" : t.hex;
+      b.style.color = "#0b0a14";
+      b.style.borderColor = "transparent";
+    }
+    b.addEventListener("click", ()=> onPick(t.id));
+    container.appendChild(b);
+  });
+}
+function renderBoosterTagRow(){
+  buildTagRow(document.getElementById("specializedTagSelector"), currentTag, (id)=>{
+    currentTag = id;
+    localStorage.setItem(NS+"currentSeries", id);
+    renderBoosterTagRow();
+  }, false);
+  let btn = document.getElementById("openSpecializedBtn");
+  if(TAGS.length===0){ btn.disabled = true; }
+  else updateSpecializedCostLabel();
+}
+function renderCollectionTagRow(){
+  buildTagRow(document.getElementById("collectionTagSelector"), collectionTagView, (id)=>{
+    collectionTagView = id;
+    localStorage.setItem(NS+"collectionSeriesView", id);
+    renderCollection();
+  }, true);
+}
+
+/* =====================================================
+   BOOSTER POOL & RANDOM DRAW
+===================================================== */
+function getAllPool(){ return cardsDB; }
+function getTagPool(tagId){
+  let pool = cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(tagId));
+  return pool.length ? pool : cardsDB;
+}
+function randomRarity(){
+  let r = Math.random()*100, cum=0;
+  for(let d of DROP_RATES){ cum += d.chance; if(r<=cum) return d.rarity; }
+  return 1;
+}
+function randomCard(pool, minRarity){
+  let rarity;
+  if(minRarity){ do{ rarity = randomRarity(); }while(rarity < minRarity); }
+  else rarity = randomRarity();
+  let candidates = pool.filter(c=>c.rarity===rarity);
+  if(candidates.length===0) candidates = pool;
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+function sortByRarity(pack){ pack.sort((a,b)=>a.rarity-b.rarity); }
+function generatePack(size, pool){ let p=[]; for(let i=0;i<size;i++) p.push(randomCard(pool)); sortByRarity(p); return p; }
+function generatePackWithPity(size, pool){ let p=[randomCard(pool,6)]; for(let i=1;i<size;i++) p.push(randomCard(pool)); sortByRarity(p); return p; }
+function generateGoldenPack(size, pool){
+  let p=[];
+  for(let i=0;i<size;i++) p.push(i<3 ? randomCard(pool,5) : randomCard(pool));
+  sortByRarity(p); return p;
+}
+
+function addToCollection(pack){
+  pack.forEach(card=>{
+    if(!collection[card.id]) collection[card.id] = {copies:1};
+    else collection[card.id].copies = (collection[card.id].copies||0) + 1;
+  });
+  saveCollection();
+}
+
+/* =====================================================
+   PITY DISPLAY
+===================================================== */
+function updatePityDisplay(){
+  let el = document.getElementById("pityDisplay");
+  let remaining = PITY_THRESHOLD - pityCounter;
+  let pct = Math.round((pityCounter/PITY_THRESHOLD)*100);
+  let color = pct<50 ? "var(--jv)" : pct<75 ? "var(--r5)" : "var(--r6)";
+  el.innerHTML = `<div class="pity-block">
+    <div class="pity-label"><span>🎯 Pitié</span><span>${pityCounter} / ${PITY_THRESHOLD}</span></div>
+    <div class="pity-bar-bg"><div class="pity-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+    <div class="pity-sub">Carte Secrète garantie dans ${remaining} booster${remaining>1?"s":""}</div>
+  </div>`;
+}
+
+/* =====================================================
+   COOLDOWNS
+===================================================== */
+let classicCooldownInterval = null;
+let specializedCooldownInterval = null;
+
+function startClassicCooldownTicker(){
+  clearInterval(classicCooldownInterval);
+  classicCooldownInterval = setInterval(()=>{
+    let diff = CLASSIC_COOLDOWN_MS - (Date.now()-lastClassicOpen);
+    let el = document.getElementById("classicCooldownLabel");
+    let btn = document.getElementById("openClassicBtn");
+    if(diff<=0){ el.textContent=""; btn.disabled=false; clearInterval(classicCooldownInterval); return; }
+    el.textContent = "Prochain booster classique dans " + Math.ceil(diff/1000) + "s";
+    btn.disabled = true;
+  }, 500);
+}
+function startSpecializedCooldownTicker(){
+  clearInterval(specializedCooldownInterval);
+  specializedCooldownInterval = setInterval(()=>{
+    let diff = SPECIALIZED_COOLDOWN_MS - (Date.now()-lastSpecializedOpen);
+    let el = document.getElementById("specializedCooldownLabel");
+    let btn = document.getElementById("openSpecializedBtn");
+    if(diff<=0){ el.textContent=""; btn.disabled=false; clearInterval(specializedCooldownInterval); return; }
+    el.textContent = "Prochain booster spécialisé dans " + Math.ceil(diff/1000) + "s";
+    btn.disabled = true;
+  }, 500);
+}
+function updateSpecializedCostLabel(){
+  document.getElementById("specializedCostLabel").textContent = "Gratuit";
+  let onCooldown = Date.now() - lastSpecializedOpen < SPECIALIZED_COOLDOWN_MS;
+  document.getElementById("openSpecializedBtn").disabled = onCooldown;
+}
+
+/* =====================================================
+   OPEN BOOSTERS (cooldown based)
+===================================================== */
+document.getElementById("openClassicBtn").addEventListener("click", ()=>{
+  let now = Date.now();
+  if(now - lastClassicOpen < CLASSIC_COOLDOWN_MS){
+    toast("⏳ Booster classique encore en recharge.");
+    return;
+  }
+  lastClassicOpen = now;
+  localStorage.setItem(NS+"lastBoosterOpen", now);
+  runBoosterOpening(getAllPool(), false);
+  startClassicCooldownTicker();
+});
+
+document.getElementById("openSpecializedBtn").addEventListener("click", ()=>{
+  if(!currentTag){
+    toast("Crée un tag dans Paramètres pour utiliser le booster spécialisé.");
+    return;
+  }
+  let now = Date.now();
+  if(now - lastSpecializedOpen < SPECIALIZED_COOLDOWN_MS){
+    toast("⏳ Booster spécialisé encore en recharge.");
+    return;
+  }
+  lastSpecializedOpen = now;
+  localStorage.setItem(NS+"lastSpecializedOpen", now);
+  runBoosterOpening(getTagPool(currentTag), false);
+  startSpecializedCooldownTicker();
+  updateSpecializedCostLabel();
+});
+
+function runBoosterOpening(pool, isGolden){
+  pityCounter++;
+  savePity();
+  let pack, pityHit=false;
+  if(pityCounter >= PITY_THRESHOLD){
+    pack = generatePackWithPity(6, pool);
+    pityCounter = 0; savePity();
+    pityHit = true;
+  } else if(isGolden){
+    pack = generateGoldenPack(6, pool);
+  } else {
+    pack = generatePack(6, pool);
+  }
+  if(!pityHit && pack.some(c=>c.rarity>=6)){ pityCounter=0; savePity(); }
+  updatePityDisplay();
+  addToCollection(pack);
+  bumpQuest("boostersOpened", 1);
+  if(pack.some(c=>c.rarity>=3)) bumpQuest("raresFound", 1);
+  showTab("booster");
+  if(pityHit) toast("🎯 Pitié activée ! Carte Secrète garantie.");
+  renderBoosterReveal(pack);
+}
+
+/* =====================================================
+   BOOSTER REVEAL UI
+===================================================== */
+function renderBoosterReveal(pack){
+  let stage = document.getElementById("boosterStage");
+  stage.innerHTML = "";
+  let idx = 0;
+  let revealed = new Array(pack.length).fill(false);
+  let epicShown = new Array(pack.length).fill(false);
+
+  let counter = document.createElement("div");
+  counter.className = "reveal-counter";
+  stage.appendChild(counter);
+
+  let wrap = document.createElement("div");
+  wrap.className = "reveal-wrap";
+  let flip = document.createElement("div");
+  flip.className = "flip-card";
+  let front = document.createElement("div");
+  front.className = "flip-face flip-front";
+  front.textContent = "🍍";
+  let back = document.createElement("div");
+  back.className = "flip-face flip-back";
+  flip.appendChild(front); flip.appendChild(back);
+  wrap.appendChild(flip);
+  stage.appendChild(wrap);
+
+  let hint = document.createElement("div");
+  hint.className = "reveal-hint";
+  hint.textContent = "Touche la carte pour la révéler";
+  stage.appendChild(hint);
+
+  let navRow = document.createElement("div");
+  navRow.className = "reveal-nav";
+  let prevBtn = document.createElement("button");
+  prevBtn.className = "btn secondary small"; prevBtn.textContent = "◀ Précédent";
+  let nextBtn = document.createElement("button");
+  nextBtn.className = "btn secondary small"; nextBtn.textContent = "Suivant ▶";
+  navRow.appendChild(prevBtn); navRow.appendChild(nextBtn);
+  stage.appendChild(navRow);
+
+  let recap = document.createElement("div");
+  recap.id = "boosterRecap";
+  stage.appendChild(recap);
+
+  function fillBack(card){
+    back.innerHTML = "";
+    back.className = "flip-face flip-back rarity-" + card.rarity + (card.rarity>=6 ? " holo" : "");
+    let data = collection[card.id];
+    if(data && data.copies===1){
+      let nt = document.createElement("div"); nt.className="new-tag"; nt.textContent="NEW"; back.appendChild(nt);
+    }
+    back.appendChild(cardImageEl(card, "ph"));
+    let n = document.createElement("div"); n.className="fname"; n.textContent = card.name; back.appendChild(n);
+    let s = document.createElement("div"); s.className="fstars"; s.textContent = starsShort(card.rarity) + " x" + (data?data.copies:1); back.appendChild(s);
+  }
+
+  function renderIndex(){
+    counter.textContent = (idx+1) + " / " + pack.length;
+    let card = pack[idx];
+    flip.classList.remove("flipped");
+    fillBack(card);
+    hint.style.display = revealed[idx] ? "none" : "block";
+    if(revealed[idx]) flip.classList.add("flipped");
+    prevBtn.disabled = idx===0;
+    nextBtn.disabled = false;
+    recap.style.display = "none";
+  }
+
+  flip.addEventListener("click", ()=>{
+    if(revealed[idx]) return;
+    revealed[idx] = true;
+    let card = pack[idx];
+    if(card.rarity >= 4 && !epicShown[idx]){
+      epicShown[idx] = true;
+      playEpicOverlay(card, ()=>{
+        flip.classList.add("flipped");
+        hint.style.display = "none";
+        maybeShowRecap();
+      });
+    } else {
+      flip.classList.add("flipped");
+      hint.style.display = "none";
+      maybeShowRecap();
+    }
+  });
+  prevBtn.addEventListener("click", ()=>{ if(idx>0){ idx--; renderIndex(); } });
+  nextBtn.addEventListener("click", ()=>{
+    if(idx<pack.length-1){ idx++; renderIndex(); }
+    else maybeShowRecap(true);
+  });
+
+  function maybeShowRecap(force){
+    if(force || revealed.every(r=>r)){
+      recap.style.display = "block";
+      recap.innerHTML = "<h3>Résumé du booster</h3>";
+      let grid = document.createElement("div");
+      grid.className = "recap-grid";
+      pack.forEach(card=>{
+        let el = document.createElement("div");
+        el.className = "card rarity-" + card.rarity + (card.rarity>=6 ? " holo" : "");
+        el.appendChild(cardImageEl(card));
+        let name = document.createElement("div"); name.className="cname"; name.textContent = card.name;
+        let star = document.createElement("div"); star.className="cstars"; star.textContent = starsShort(card.rarity);
+        el.appendChild(name); el.appendChild(star);
+        grid.appendChild(el);
+      });
+      recap.appendChild(grid);
+    }
+  }
+
+  renderIndex();
+  renderShop();
+}
+
+/* =====================================================
+   EPIC OVERLAY (rarity 4+)
+===================================================== */
+const EPIC_CFG = {
+  4:{label:"✦ ÉPIQUE ✦", color:"#b06bff", count:16},
+  5:{label:"★ LÉGENDAIRE ★", color:"#ffb020", count:26},
+  6:{label:"◈ SECRÈTE ◈", color:"#ff3b5c", count:40},
+  7:{label:"💎 DIAMANT 💎", color:"#00e5ff", count:60}
+};
+function playEpicOverlay(card, onDone){
+  let cfg = EPIC_CFG[card.rarity];
+  let overlay = document.getElementById("epicOverlay");
+  let particles = document.getElementById("epicParticles");
+  let label = document.getElementById("epicLabel");
+  let epicCard = document.getElementById("epicCard");
+  let imgHolder = document.getElementById("epicImgHolder");
+  let nameEl = document.getElementById("epicName");
+  let starsEl = document.getElementById("epicStars");
+
+  label.textContent = cfg.label;
+  label.style.color = cfg.color;
+  label.style.textShadow = "0 0 24px "+cfg.color;
+  nameEl.textContent = card.name;
+  starsEl.textContent = starsShort(card.rarity);
+  imgHolder.innerHTML = "";
+  imgHolder.appendChild(cardImageEl(card));
+  epicCard.style.background = "radial-gradient(circle, "+cfg.color+"33 0%, transparent 70%)";
+
+  particles.innerHTML = "";
+  for(let i=0;i<cfg.count;i++){
+    let p = document.createElement("div");
+    p.className = "epic-particle";
+    let angle = Math.random()*360, dist=80+Math.random()*260, size=4+Math.random()*10;
+    let dur = 0.7+Math.random()*0.9, delay = Math.random()*0.3;
+    let tx = Math.cos(angle*Math.PI/180)*dist, ty = Math.sin(angle*Math.PI/180)*dist;
+    p.style.cssText = `left:50%;top:50%;width:${size}px;height:${size}px;background:${cfg.color};--tx:${tx}px;--ty:${ty}px;animation-duration:${dur}s;animation-delay:${delay}s;box-shadow:0 0 ${size*2}px ${cfg.color};`;
+    particles.appendChild(p);
+  }
+
+  overlay.classList.add("show");
+  epicCard.classList.remove("reveal");
+  setTimeout(()=> epicCard.classList.add("reveal"), 80);
+
+  let done = false;
+  function finish(){
+    if(done) return;
+    done = true;
+    overlay.classList.remove("show");
+    overlay.onclick = null;
+    onDone();
+  }
+  overlay.onclick = finish;
+  setTimeout(finish, card.rarity>=6 ? 2600 : 1700);
+}
+
+/* =====================================================
+   COLLECTION RENDER
+===================================================== */
+function renderCollection(){
+  renderCollectionTagRow();
+  let list = document.getElementById("collectionList");
+  list.innerHTML = "";
+  let pool = collectionTagView==="all" ? cardsDB : cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(collectionTagView));
+  pool = pool.slice().sort((a,b)=> a.rarity-b.rarity || a.name.localeCompare(b.name));
+  let owned = pool.filter(c=>collection[c.id]).length;
+  document.getElementById("collectionProgress").textContent = owned + " / " + pool.length + " cartes découvertes";
+
+  if(pool.length===0){
+    list.innerHTML = "<div class='empty-state'>Aucune carte dans ce tag pour le moment.</div>";
+    return;
+  }
+
+  pool.forEach(card=>{
+    let data = collection[card.id];
+    let el = document.createElement("div");
+    el.className = "card rarity-" + card.rarity + (card.rarity>=6 && data ? " holo" : "") + (!data ? " locked" : "");
+    let tag = document.createElement("div"); tag.className="cseries-tag"; tag.textContent = cardPlaceholderEmoji(card);
+    el.appendChild(tag);
+    el.appendChild(cardImageEl(card, data ? "" : "grayed"));
+    let name = document.createElement("div"); name.className="cname"; name.textContent = data ? card.name : "???";
+    let star = document.createElement("div"); star.className="cstars"; star.textContent = starsShort(card.rarity);
+    el.appendChild(name); el.appendChild(star);
+    if(data){
+      let copies = document.createElement("div"); copies.className="ccopies"; copies.textContent = "x" + (data.copies||1);
+      el.appendChild(copies);
+      if((data.copies||1) > 1){
+        let btn = document.createElement("button");
+        btn.className = "icon-btn"; btn.style.marginTop="4px"; btn.style.fontSize="10.5px";
+        btn.textContent = "♻️ Recycler";
+        btn.addEventListener("click", ()=> recycleOne(card.id));
+        el.appendChild(btn);
+      }
+    }
+    list.appendChild(el);
+  });
+}
+function recycleOne(cardId){
+  let card = findCard(cardId);
+  let data = collection[cardId];
+  if(!card || !data || (data.copies||1)<=1){ toast("Aucun doublon à recycler."); return; }
+  let dup = (data.copies||1) - 1;
+  data.copies = 1;
+  saveCollection();
+  addPieces(RECYCLE_YIELD[card.rarity] * dup);
+  bumpQuest("duplicatesRecycled", 1);
+  renderCollection(); renderShop();
+  toast("♻️ +" + (RECYCLE_YIELD[card.rarity]*dup) + " 🪙");
+}
+document.getElementById("recycleAllBtn").addEventListener("click", ()=>{
+  let total = 0, count = 0;
+  Object.keys(collection).forEach(id=>{
+    let data = collection[id];
+    let card = findCard(Number(id));
+    if(card && data && (data.copies||1) > 1){
+      let dup = (data.copies||1)-1;
+      total += RECYCLE_YIELD[card.rarity]*dup;
+      count += dup;
+      data.copies = 1;
+    }
+  });
+  if(count===0){ toast("Aucun doublon à recycler."); return; }
+  saveCollection();
+  addPieces(total);
+  bumpQuest("duplicatesRecycled", 1);
+  renderCollection(); renderShop();
+  toast("♻️ " + count + " doublon(s) recyclés pour +" + total + " 🪙");
+});
+
+/* =====================================================
+   SHOP
+===================================================== */
+document.getElementById("buyBoosterCrystalBtn").addEventListener("click", ()=>{
+  if(!spendCrystals(BOOSTER_CRYSTAL_COST)){ toast("Pas assez de cristaux."); return; }
+  runBoosterOpening(getAllPool(), false);
+});
+document.getElementById("buyGoldenBtn").addEventListener("click", ()=>{
+  if(!spendCrystals(GOLDEN_CRYSTAL_COST)){ toast("Pas assez de cristaux."); return; }
+  runBoosterOpening(getAllPool(), true);
+});
+document.getElementById("buyPieceBoosterBtn").addEventListener("click", ()=>{
+  if(!spendPieces(PIECE_BOOSTER_COST)){ toast("Pas assez de pièces."); return; }
+  runBoosterOpening(getAllPool(), false);
+});
+function renderShop(){
+  document.getElementById("buyBoosterCrystalBtn").disabled = crystals < BOOSTER_CRYSTAL_COST;
+  document.getElementById("buyGoldenBtn").disabled = crystals < GOLDEN_CRYSTAL_COST;
+  document.getElementById("buyPieceBoosterBtn").disabled = pieces < PIECE_BOOSTER_COST;
+  updateSpecializedCostLabel();
+
+  let list = document.getElementById("shopMissingList");
+  list.innerHTML = "";
+  let missing = cardsDB.filter(c=>!collection[c.id]).sort((a,b)=>a.rarity-b.rarity || a.name.localeCompare(b.name));
+  if(missing.length===0){
+    list.innerHTML = "<div class='empty-state'>Tu possèdes déjà toutes les cartes !</div>";
+    return;
+  }
+  missing.forEach(card=>{
+    let cost = SHOP_CARD_COST[card.rarity] || 0;
+    let el = document.createElement("div");
+    el.className = "missing-card";
+    el.appendChild(cardImageEl(card));
+    let n = document.createElement("div"); n.style.fontWeight="700"; n.style.fontSize="12px"; n.textContent = card.name;
+    let s = document.createElement("div"); s.className="cstars"; s.style.fontSize="11px"; s.textContent = starsShort(card.rarity);
+    let p = document.createElement("div"); p.className="price"; p.textContent = cost + " 💎";
+    let btn = document.createElement("button"); btn.className="btn small"; btn.style.width="100%"; btn.textContent="Acheter";
+    btn.disabled = crystals < cost;
+    btn.addEventListener("click", ()=>{
+      if(!spendCrystals(cost)){ toast("Pas assez de cristaux."); return; }
+      collection[card.id] = {copies:1};
+      saveCollection();
+      renderCollection(); renderShop();
+      toast("✅ Carte achetée : " + card.name);
+    });
+    el.appendChild(n); el.appendChild(s); el.appendChild(p); el.appendChild(btn);
+    list.appendChild(el);
+  });
+}
+
+/* =====================================================
+   QUESTS
+===================================================== */
+function renderQuests(){
+  questState = loadQuestState();
+  let container = document.getElementById("questsList");
+  container.innerHTML = "";
+  DAILY_QUESTS.forEach(q=>{
+    let progress = questState.trackers[q.tracker] || 0;
+    let complete = progress >= q.target;
+    let claimed = questState.claimed[q.id];
+    let card = document.createElement("div");
+    card.className = "quest-card" + (complete?" complete":"") + (claimed?" claimed":"");
+    card.innerHTML = `
+      <div class="quest-title">${q.title}</div>
+      <div class="quest-desc">${q.desc}</div>
+      <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${Math.min(100,Math.round(progress/q.target*100))}%"></div></div>
+      <div class="quest-status-row"><span>${Math.min(progress,q.target)} / ${q.target}</span><span>+${q.reward} 💎</span></div>
+    `;
+    let btn = document.createElement("button");
+    btn.className = "btn small" + (complete && !claimed ? "" : " secondary");
+    btn.style.width = "100%";
+    btn.disabled = !complete || claimed;
+    btn.textContent = claimed ? "Réclamé" : (complete ? "Réclamer" : "En cours");
+    btn.addEventListener("click", ()=>{
+      if(claimed || !complete) return;
+      questState.claimed[q.id] = true;
+      saveQuestState();
+      addCrystals(q.reward);
+      renderQuests();
+      toast("✅ +" + q.reward + " 💎");
+    });
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
+}
+
+/* =====================================================
+   ADMIN — ACCESS GATE
+===================================================== */
+const _kx = "c175ce727abb8236ddfda7d5ac347ed5fbe95885d2287363977a4c8770734bdf";
+const _sk = NS + "az";
+
+async function _dg(s){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function isAdminAuthed(){ return sessionStorage.getItem(_sk) === "1"; }
+function showAdminGate(){
+  let authed = isAdminAuthed();
+  document.getElementById("adminLogin").style.display = authed ? "none" : "block";
+  document.getElementById("adminContent").style.display = authed ? "block" : "none";
+  if(authed){
+    renderAdminCardTagsPicker();
+    renderTagList();
+    renderAdminList();
+  }
+}
+document.getElementById("adminLoginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  let id = document.getElementById("al_id").value;
+  let pass = document.getElementById("al_pass").value;
+  let digest = await _dg(id + "|" + pass);
+  let errorEl = document.getElementById("al_error");
+  if(digest === _kx){
+    sessionStorage.setItem(_sk, "1");
+    errorEl.style.display = "none";
+    document.getElementById("al_id").value = "";
+    document.getElementById("al_pass").value = "";
+    showAdminGate();
+  } else {
+    errorEl.style.display = "block";
+  }
+});
+document.getElementById("adminLogoutBtn").addEventListener("click", ()=>{
+  sessionStorage.removeItem(_sk);
+  showAdminGate();
+});
+
+/* =====================================================
+   ADMIN — EXPORT / IMPORT
+===================================================== */
+document.getElementById("exportDataBtn").addEventListener("click", ()=>{
+  let payload = { tags: TAGS, cards: cardsDB };
+  let blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "ananas-tcg-export.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast("⬇️ Export téléchargé.");
+});
+
+document.getElementById("importDataInput").addEventListener("change", (e)=>{
+  let file = e.target.files[0];
+  if(!file) return;
+  let reader = new FileReader();
+  reader.onload = (ev)=>{
+    let data;
+    try{
+      data = JSON.parse(ev.target.result);
+      if(!Array.isArray(data.tags) || !Array.isArray(data.cards)) throw new Error("format invalide");
+    }catch(err){
+      toast("⚠️ Fichier invalide.");
+      e.target.value = "";
+      return;
+    }
+    if(!confirm("Importer ce fichier ? Cela remplace tous tes tags et cartes actuels sur cet appareil.")){
+      e.target.value = "";
+      return;
+    }
+    TAGS = data.tags;
+    cardsDB = data.cards;
+    cardsDB.forEach(c=>{ if(!Array.isArray(c.tags)) c.tags = []; });
+    saveTags();
+    saveCardsDB();
+    resetTagForm();
+    resetAdminForm();
+    renderTagList();
+    renderAdminCardTagsPicker();
+    renderAdminList();
+    renderBoosterTagRow();
+    renderCollectionTagRow();
+    renderCollection();
+    renderShop();
+    e.target.value = "";
+    toast("✅ Import réussi.");
+  };
+  reader.readAsText(file);
+});
+
+
+/* =====================================================
+   ADMIN — TAG CRUD
+===================================================== */
+let selectedCardTags = [];
+
+function renderAdminCardTagsPicker(){
+  let picker = document.getElementById("af_tagsPicker");
+  picker.innerHTML = "";
+  if(TAGS.length===0){
+    picker.innerHTML = "<div class='empty-state' style='padding:6px 0;'>Aucun tag créé pour le moment.</div>";
+    return;
+  }
+  TAGS.forEach(t=>{
+    let chip = document.createElement("div");
+    let active = selectedCardTags.includes(t.id);
+    chip.className = "tag-chip" + (active ? " active" : "");
+    chip.textContent = t.emoji + " " + t.label;
+    if(active){
+      chip.style.background = t.hex;
+      chip.style.color = "#0b0a14";
+      chip.style.borderColor = "transparent";
+    }
+    chip.addEventListener("click", ()=>{
+      if(selectedCardTags.includes(t.id)) selectedCardTags = selectedCardTags.filter(x=>x!==t.id);
+      else selectedCardTags.push(t.id);
+      renderAdminCardTagsPicker();
+    });
+    picker.appendChild(chip);
+  });
+}
+
+let editingTagId = null;
+
+function resetTagForm(){
+  editingTagId = null;
+  document.getElementById("tf_label").value = "";
+  document.getElementById("tf_emoji").value = "";
+  document.getElementById("tf_color").value = "#37cfff";
+  document.getElementById("tf_submitBtn").textContent = "Ajouter le tag";
+  document.getElementById("tf_cancelBtn").style.display = "none";
+}
+
+function renderTagList(){
+  let list = document.getElementById("tagList");
+  list.innerHTML = "";
+  if(TAGS.length===0){
+    list.innerHTML = "<div class='empty-state'>Aucun tag pour le moment.</div>";
+    return;
+  }
+  TAGS.forEach(t=>{
+    let count = cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(t.id)).length;
+    let row = document.createElement("div");
+    row.className = "admin-row";
+    let swatch = document.createElement("div");
+    swatch.className = "ph";
+    swatch.style.background = t.hex;
+    swatch.textContent = t.emoji;
+    row.appendChild(swatch);
+    let info = document.createElement("div"); info.className = "info";
+    info.innerHTML = `<div class="n">${t.label}</div><div class="m">${count} carte${count>1?"s":""}</div>`;
+    row.appendChild(info);
+    let actions = document.createElement("div"); actions.className = "actions";
+    let editBtn = document.createElement("button");
+    editBtn.className = "icon-btn";
+    editBtn.textContent = "✏️";
+    editBtn.title = "Modifier le tag";
+    editBtn.addEventListener("click", ()=>editTag(t.id));
+    actions.appendChild(editBtn);
+    let delBtn = document.createElement("button");
+    delBtn.className = "icon-btn del";
+    delBtn.textContent = "🗑️";
+    delBtn.title = "Supprimer le tag";
+    delBtn.addEventListener("click", ()=>deleteTag(t.id));
+    actions.appendChild(delBtn);
+    row.appendChild(actions);
+    list.appendChild(row);
+  });
+}
+
+function editTag(id){
+  let t = tagInfo(id);
+  if(!t) return;
+  editingTagId = id;
+  document.getElementById("tf_label").value = t.label;
+  document.getElementById("tf_emoji").value = t.emoji;
+  document.getElementById("tf_color").value = t.hex;
+  document.getElementById("tf_submitBtn").textContent = "Modifier le tag";
+  document.getElementById("tf_cancelBtn").style.display = "inline-block";
+  document.getElementById("tagForm").scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.getElementById("tf_cancelBtn").addEventListener("click", resetTagForm);
+
+document.getElementById("tagForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  let label = document.getElementById("tf_label").value.trim();
+  if(!label){ toast("Entre un nom de tag."); return; }
+  let emoji = document.getElementById("tf_emoji").value.trim() || "🃏";
+  let hex = document.getElementById("tf_color").value || "#37cfff";
+
+  if(editingTagId !== null){
+    let t = tagInfo(editingTagId);
+    if(t){ t.label = label; t.emoji = emoji; t.hex = hex; }
+    saveTags();
+    resetTagForm();
+    renderTagList();
+    renderAdminCardTagsPicker();
+    renderAdminList();
+    renderBoosterTagRow();
+    renderCollectionTagRow();
+    renderCollection();
+    toast("✅ Tag modifié.");
+    return;
+  }
+
+  let id = slugifyTagId(label);
+  TAGS.push({ id, label, emoji, hex });
+  saveTags();
+  resetTagForm();
+  renderTagList();
+  renderAdminCardTagsPicker();
+  renderBoosterTagRow();
+  renderCollectionTagRow();
+  toast("✅ Tag ajouté.");
+});
+
+function deleteTag(id){
+  let t = tagInfo(id);
+  if(!t) return;
+  let affectedCards = cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(id));
+  let msg = affectedCards.length > 0
+    ? `Supprimer le tag "${t.label}" ? Il sera retiré de ${affectedCards.length} carte(s), mais ces cartes ne seront PAS supprimées.`
+    : `Supprimer le tag "${t.label}" ?`;
+  if(!confirm(msg)) return;
+
+  cardsDB.forEach(c=>{
+    if(Array.isArray(c.tags)) c.tags = c.tags.filter(tg=>tg!==id);
+  });
+  TAGS = TAGS.filter(x=>x.id!==id);
+  selectedCardTags = selectedCardTags.filter(x=>x!==id);
+
+  saveCardsDB();
+  saveTags();
+
+  if(currentTag === id){
+    currentTag = TAGS[0] ? TAGS[0].id : null;
+    localStorage.setItem(NS+"currentSeries", currentTag || "");
+  }
+  if(collectionTagView === id){
+    collectionTagView = "all";
+    localStorage.setItem(NS+"collectionSeriesView", collectionTagView);
+  }
+  if(editingTagId === id) resetTagForm();
+
+  renderTagList();
+  renderAdminCardTagsPicker();
+  renderBoosterTagRow();
+  renderCollectionTagRow();
+  renderAdminList();
+  renderCollection();
+  renderShop();
+  toast("🗑️ Tag supprimé.");
+}
+
+/* =====================================================
+   ADMIN — CARD CRUD
+===================================================== */
+let pendingImage = null;
+
+function resetAdminForm(){
+  editingCardId = null;
+  document.getElementById("af_name").value = "";
+  document.getElementById("af_url").value = "";
+  document.getElementById("af_file").value = "";
+  selectedCardTags = [];
+  renderAdminCardTagsPicker();
+  pendingImage = null;
+  document.getElementById("af_preview").style.display = "none";
+  document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.remove("active"));
+  document.querySelector('.rarity-chip[data-r="1"]').classList.add("active");
+  document.getElementById("af_submitBtn").textContent = "Ajouter la carte";
+  document.getElementById("af_cancelBtn").style.display = "none";
+}
+
+document.querySelectorAll(".rarity-chip").forEach(chip=>{
+  chip.addEventListener("click", ()=>{
+    document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+});
+document.querySelector('.rarity-chip[data-r="1"]').classList.add("active");
+
+function getSelectedRarity(){
+  let active = document.querySelector(".rarity-chip.active");
+  return active ? Number(active.dataset.r) : 1;
+}
+
+function compressImageFile(file, cb){
+  let reader = new FileReader();
+  reader.onload = function(e){
+    let img = new Image();
+    img.onload = function(){
+      let maxW = 420;
+      let scale = Math.min(1, maxW / img.width);
+      let w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      let canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      let ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL("image/jpeg", 0.78));
+    };
+    img.onerror = function(){ cb(null); };
+    img.src = e.target.result;
+  };
+  reader.onerror = function(){ cb(null); };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById("af_file").addEventListener("change", (e)=>{
+  let file = e.target.files[0];
+  if(!file) return;
+  compressImageFile(file, (dataUrl)=>{
+    pendingImage = dataUrl;
+    let prev = document.getElementById("af_preview");
+    prev.src = dataUrl;
+    prev.style.display = "block";
+  });
+});
+document.getElementById("af_url").addEventListener("input", (e)=>{
+  let url = e.target.value.trim();
+  if(url){
+    pendingImage = null;
+    let prev = document.getElementById("af_preview");
+    prev.src = url;
+    prev.style.display = "block";
+  }
+});
+
+document.getElementById("adminForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  let name = document.getElementById("af_name").value.trim();
+  if(!name){ toast("Entre un nom de carte."); return; }
+  let tags = selectedCardTags.slice();
+  let rarity = getSelectedRarity();
+  let urlVal = document.getElementById("af_url").value.trim();
+  let image = pendingImage || (urlVal !== "" ? urlVal : null);
+
+  if(editingCardId !== null){
+    let card = findCard(editingCardId);
+    if(card){
+      card.name = name; card.tags = tags; card.rarity = rarity;
+      if(image !== null) card.image = image;
+    }
+    toast("✅ Carte modifiée.");
+  } else {
+    cardsDB.push({ id: nextCardId(), name, tags, rarity, image });
+    toast("✅ Carte ajoutée.");
+  }
+  saveCardsDB();
+  resetAdminForm();
+  renderAdminList();
+  renderTagList();
+  renderCollection();
+  renderShop();
+});
+
+document.getElementById("af_cancelBtn").addEventListener("click", resetAdminForm);
+
+function editCard(id){
+  let card = findCard(id);
+  if(!card) return;
+  editingCardId = id;
+  document.getElementById("af_name").value = card.name;
+  selectedCardTags = Array.isArray(card.tags) ? card.tags.slice() : [];
+  renderAdminCardTagsPicker();
+  document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.toggle("active", Number(c.dataset.r)===card.rarity));
+  document.getElementById("af_url").value = "";
+  document.getElementById("af_file").value = "";
+  pendingImage = null;
+  let prev = document.getElementById("af_preview");
+  if(card.image){ prev.src = card.image; prev.style.display = "block"; } else { prev.style.display = "none"; }
+  document.getElementById("af_submitBtn").textContent = "Modifier la carte";
+  document.getElementById("af_cancelBtn").style.display = "inline-block";
+  document.getElementById("settings").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function deleteCard(id){
+  let card = findCard(id);
+  if(!card) return;
+  if(!confirm("Supprimer définitivement \"" + card.name + "\" ?")) return;
+  cardsDB = cardsDB.filter(c=>c.id!==id);
+  delete collection[id];
+  saveCardsDB();
+  saveCollection();
+  if(editingCardId===id) resetAdminForm();
+  renderAdminList();
+  renderTagList();
+  renderCollection();
+  renderShop();
+  toast("🗑️ Carte supprimée.");
+}
+
+function renderAdminList(){
+  let list = document.getElementById("adminList");
+  list.innerHTML = "";
+  document.getElementById("adminCount").textContent = cardsDB.length;
+  if(cardsDB.length===0){
+    list.innerHTML = "<div class='empty-state'>Aucune carte pour le moment. Ajoute-en une !</div>";
+    return;
+  }
+  let sorted = cardsDB.slice().sort((a,b)=> a.name.localeCompare(b.name));
+  sorted.forEach(card=>{
+    let row = document.createElement("div");
+    row.className = "admin-row";
+    if(card.image){
+      let img = document.createElement("img"); img.src = card.image; row.appendChild(img);
+    } else {
+      let ph = document.createElement("div"); ph.className="ph"; ph.textContent = cardPlaceholderEmoji(card); row.appendChild(ph);
+    }
+    let info = document.createElement("div"); info.className="info";
+    let tagBadges = (Array.isArray(card.tags) && card.tags.length)
+      ? card.tags.map(tid=>{
+          let t = tagInfo(tid);
+          return t ? `<span class="card-tag-badge" style="background:${t.hex};color:#0b0a14;">${t.emoji} ${t.label}</span>` : "";
+        }).join("")
+      : `<span class="card-tag-badge" style="background:rgba(255,255,255,0.08);color:var(--text-dim);">Sans tag</span>`;
+    info.innerHTML = `<div class="n">${card.name}</div><div class="m">${starsShort(card.rarity)} · ${RARITY_LABEL[card.rarity]}</div><div>${tagBadges}</div>`;
+    let actions = document.createElement("div"); actions.className="actions";
+    let editBtn = document.createElement("button"); editBtn.className="icon-btn"; editBtn.textContent="✏️";
+    editBtn.addEventListener("click", ()=>editCard(card.id));
+    let delBtn = document.createElement("button"); delBtn.className="icon-btn del"; delBtn.textContent="🗑️";
+    delBtn.addEventListener("click", ()=>deleteCard(card.id));
+    actions.appendChild(editBtn); actions.appendChild(delBtn);
+    row.appendChild(info); row.appendChild(actions);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById("resetCollectionBtn").addEventListener("click", ()=>{
+  if(!confirm("Réinitialiser toute ta collection, tes cristaux et tes pièces ?")) return;
+  collection = {};
+  crystals = 300;
+  pieces = 0;
+  pityCounter = 0;
+  saveCollection(); saveCrystals(); savePieces(); savePity();
+  updateResourceDisplay(); updatePityDisplay();
+  renderCollection(); renderShop();
+  toast("🗑️ Collection réinitialisée.");
+});
+
+/* =====================================================
+   INIT
+===================================================== */
+updateResourceDisplay();
+updatePityDisplay();
+renderBoosterTagRow();
+renderCollection();
+renderShop();
+renderQuests();
+showAdminGate();
+if(Date.now() - lastClassicOpen < CLASSIC_COOLDOWN_MS) startClassicCooldownTicker();
+if(Date.now() - lastSpecializedOpen < SPECIALIZED_COOLDOWN_MS) startSpecializedCooldownTicker();
+
+})();
+</script>
+</body>
+</html>
