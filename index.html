@@ -449,10 +449,10 @@
     <section id="settings" class="tab">
       <div class="panel">
         <h2>Paramètres</h2>
-        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">La gestion des tags et des cartes est réservée à l'administrateur du site.</p>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Les outils de test sont réservés à l'administrateur du site.</p>
 
         <div id="adminLogin">
-          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Accès réservé. Connecte-toi pour gérer les tags et les cartes.</p>
+          <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Accès réservé. Connecte-toi pour accéder aux outils de test.</p>
           <form class="admin-form" id="adminLoginForm">
             <div>
               <label>Identifiant</label>
@@ -472,82 +472,23 @@
           <button class="icon-btn" id="adminLogoutBtn" type="button">🔓 Se déconnecter</button>
         </div>
 
-        <h3 style="margin-top:0;">💾 Sauvegarde</h3>
-        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:12px;">Les images que tu ajoutes restent dans ton navigateur — les autres joueurs ne les voient pas automatiquement. Exporte un fichier avec toutes tes cartes et tags (images incluses) pour les transférer ou les intégrer au site pour tout le monde.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
-          <button class="btn secondary small" id="exportDataBtn" type="button">⬇️ Exporter (JSON)</button>
-          <label class="btn secondary small" style="cursor:pointer;text-align:center;margin:0;">
-            ⬆️ Importer un fichier
-            <input type="file" id="importDataInput" accept="application/json" style="display:none;">
-          </label>
+        <h3 style="margin-top:0;">🧪 Outils de test</h3>
+        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Les cartes et tags de ce site sont fixés dans son code. Ces outils servent uniquement à tester le jeu sur ton propre compte — ils ne modifient pas le catalogue.</p>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+          <button class="btn secondary small" id="giveCrystalsBtn" type="button">+500 💎</button>
+          <button class="btn secondary small" id="givePiecesBtn" type="button">+200 🪙</button>
+          <button class="btn secondary small" id="resetCooldownsBtn" type="button">⏱️ Réinitialiser les cooldowns</button>
         </div>
 
-        <h3 style="margin-top:0;">🏷️ Tags</h3>
-        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:12px;">Une carte peut porter plusieurs tags, un seul, ou aucun. Supprimer un tag le retire des cartes concernées, sans supprimer les cartes elles-mêmes.</p>
-        <form class="admin-form" id="tagForm">
-          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
-            <div style="flex:2;min-width:120px;">
-              <label>Nom du tag</label>
-              <input type="text" id="tf_label" placeholder="Ex: Films" required>
-            </div>
-            <div style="flex:1;min-width:70px;">
-              <label>Emoji</label>
-              <input type="text" id="tf_emoji" placeholder="🎬" maxlength="4">
-            </div>
-            <div style="flex:1;min-width:70px;">
-              <label>Couleur</label>
-              <input type="color" id="tf_color" value="#37cfff" style="padding:4px;height:44px;">
-            </div>
+        <h3>Donner une carte</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;">
+          <div style="flex:1;min-width:180px;">
+            <label>Carte</label>
+            <select id="tt_cardSelect"></select>
           </div>
-          <div style="display:flex;gap:8px;">
-            <button type="submit" class="btn secondary" id="tf_submitBtn">Ajouter le tag</button>
-            <button type="button" class="btn secondary" id="tf_cancelBtn" style="display:none;">Annuler</button>
-          </div>
-        </form>
-        <div class="admin-list" id="tagList" style="margin-top:14px;"></div>
-
-        <h3>🃏 Cartes</h3>
-        <p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">Ajoute, modifie ou supprime des cartes. Les images sont enregistrées localement dans ton navigateur.</p>
-        <form class="admin-form" id="adminForm">
-          <div>
-            <label>Nom de la carte</label>
-            <input type="text" id="af_name" placeholder="Ex: Le Sceau Ultime" required>
-          </div>
-          <div>
-            <label>Tags (optionnel, plusieurs possibles)</label>
-            <div class="rarity-picker" id="af_tagsPicker"></div>
-          </div>
-          <div>
-            <label>Rareté</label>
-            <div class="rarity-picker" id="af_rarityPicker">
-              <div class="rarity-chip" data-r="1">⭐1</div>
-              <div class="rarity-chip" data-r="2">⭐2</div>
-              <div class="rarity-chip" data-r="3">⭐3</div>
-              <div class="rarity-chip" data-r="4">⭐4</div>
-              <div class="rarity-chip" data-r="5">⭐5</div>
-              <div class="rarity-chip" data-r="6">⭐6</div>
-              <div class="rarity-chip" data-r="7">💎7</div>
-            </div>
-          </div>
-          <div>
-            <label>Image (fichier local, recommandé)</label>
-            <input type="file" id="af_file" accept="image/*">
-          </div>
-          <div>
-            <label>ou URL d'image (optionnel)</label>
-            <input type="text" id="af_url" placeholder="https://...">
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <img id="af_preview" class="admin-preview" style="display:none;">
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button type="submit" class="btn" id="af_submitBtn">Ajouter la carte</button>
-            <button type="button" class="btn secondary" id="af_cancelBtn" style="display:none;">Annuler</button>
-          </div>
-        </form>
-
-        <h3>Cartes existantes (<span id="adminCount">0</span>)</h3>
-        <div class="admin-list" id="adminList"></div>
+          <button class="btn secondary small" id="giveCardBtn" type="button">Ajouter à ma collection</button>
+        </div>
 
         <div class="danger-zone">
           <h3 style="color:#ff8a9b;">⚠️ Zone dangereuse</h3>
@@ -581,11 +522,13 @@
    CONFIG
 ===================================================== */
 const NS = "anansTcg_";
+/* @@DEFAULT_TAGS_START@@ */
 const DEFAULT_TAGS = [
   { id:"anime",     label:"Anime",       emoji:"🎌", hex:"#ff4d8d" },
   { id:"jeuxvideo", label:"Jeux Vidéo",  emoji:"🎮", hex:"#37cfff" },
   { id:"meme",      label:"Meme",        emoji:"😂", hex:"#ffd23f" }
 ];
+/* @@DEFAULT_TAGS_END@@ */
 const RARITY_LABEL = {1:"Commune",2:"Peu commune",3:"Rare",4:"Épique",5:"Légendaire",6:"Secrète",7:"Diamant"};
 const DROP_RATES = [
   {rarity:1,chance:44.9},{rarity:2,chance:25},{rarity:3,chance:15},
@@ -605,6 +548,7 @@ const DAILY_QUESTS = [
   {id:"find_rare", title:"Trouve une carte rare", desc:"Obtiens une carte Rare (⭐⭐⭐) ou mieux", target:1, reward:25, tracker:"raresFound"}
 ];
 
+/* @@DEFAULT_CARDS_START@@ */
 const DEFAULT_CARDS = [
   {id:1,name:"Éveil du Héros",tags:["anime"],rarity:1,image:null},
   {id:2,name:"Chibi Comique",tags:["anime"],rarity:1,image:null},
@@ -634,6 +578,7 @@ const DEFAULT_CARDS = [
   {id:26,name:"Le Sigma",tags:["meme"],rarity:6,image:null},
   {id:27,name:"Meme Ultime Rare",tags:["meme"],rarity:7,image:null}
 ];
+/* @@DEFAULT_CARDS_END@@ */
 
 /* =====================================================
    STATE
@@ -1331,11 +1276,7 @@ function showAdminGate(){
   let authed = isAdminAuthed();
   document.getElementById("adminLogin").style.display = authed ? "none" : "block";
   document.getElementById("adminContent").style.display = authed ? "block" : "none";
-  if(authed){
-    renderAdminCardTagsPicker();
-    renderTagList();
-    renderAdminList();
-  }
+  if(authed) renderTestCardSelect();
 }
 document.getElementById("adminLoginForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
@@ -1359,397 +1300,57 @@ document.getElementById("adminLogoutBtn").addEventListener("click", ()=>{
 });
 
 /* =====================================================
-   ADMIN — EXPORT / IMPORT
+   ADMIN — TEST TOOLS
+   Le catalogue (tags + cartes) de ce site est figé dans son code, généré
+   par le fichier séparé "builder.html". Ces outils ne servent qu'à tester
+   le jeu sur son propre compte — ils ne modifient jamais le catalogue.
 ===================================================== */
-document.getElementById("exportDataBtn").addEventListener("click", ()=>{
-  let payload = { tags: TAGS, cards: cardsDB };
-  let blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = "ananas-tcg-export.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast("⬇️ Export téléchargé.");
+document.getElementById("giveCrystalsBtn").addEventListener("click", ()=>{
+  addCrystals(500);
+  toast("✅ +500 💎 (test)");
 });
-
-document.getElementById("importDataInput").addEventListener("change", (e)=>{
-  let file = e.target.files[0];
-  if(!file) return;
-  let reader = new FileReader();
-  reader.onload = (ev)=>{
-    let data;
-    try{
-      data = JSON.parse(ev.target.result);
-      if(!Array.isArray(data.tags) || !Array.isArray(data.cards)) throw new Error("format invalide");
-    }catch(err){
-      toast("⚠️ Fichier invalide.");
-      e.target.value = "";
-      return;
-    }
-    if(!confirm("Importer ce fichier ? Cela remplace tous tes tags et cartes actuels sur cet appareil.")){
-      e.target.value = "";
-      return;
-    }
-    TAGS = data.tags;
-    cardsDB = data.cards;
-    cardsDB.forEach(c=>{ if(!Array.isArray(c.tags)) c.tags = []; });
-    saveTags();
-    saveCardsDB();
-    resetTagForm();
-    resetAdminForm();
-    renderTagList();
-    renderAdminCardTagsPicker();
-    renderAdminList();
-    renderBoosterTagRow();
-    renderCollectionTagRow();
-    renderCollection();
-    renderShop();
-    e.target.value = "";
-    toast("✅ Import réussi.");
-  };
-  reader.readAsText(file);
+document.getElementById("givePiecesBtn").addEventListener("click", ()=>{
+  addPieces(200);
+  toast("✅ +200 🪙 (test)");
 });
-
-
-/* =====================================================
-   ADMIN — TAG CRUD
-===================================================== */
-let selectedCardTags = [];
-
-function renderAdminCardTagsPicker(){
-  let picker = document.getElementById("af_tagsPicker");
-  picker.innerHTML = "";
-  if(TAGS.length===0){
-    picker.innerHTML = "<div class='empty-state' style='padding:6px 0;'>Aucun tag créé pour le moment.</div>";
-    return;
-  }
-  TAGS.forEach(t=>{
-    let chip = document.createElement("div");
-    let active = selectedCardTags.includes(t.id);
-    chip.className = "tag-chip" + (active ? " active" : "");
-    chip.textContent = t.emoji + " " + t.label;
-    if(active){
-      chip.style.background = t.hex;
-      chip.style.color = "#0b0a14";
-      chip.style.borderColor = "transparent";
-    }
-    chip.addEventListener("click", ()=>{
-      if(selectedCardTags.includes(t.id)) selectedCardTags = selectedCardTags.filter(x=>x!==t.id);
-      else selectedCardTags.push(t.id);
-      renderAdminCardTagsPicker();
-    });
-    picker.appendChild(chip);
-  });
-}
-
-let editingTagId = null;
-
-function resetTagForm(){
-  editingTagId = null;
-  document.getElementById("tf_label").value = "";
-  document.getElementById("tf_emoji").value = "";
-  document.getElementById("tf_color").value = "#37cfff";
-  document.getElementById("tf_submitBtn").textContent = "Ajouter le tag";
-  document.getElementById("tf_cancelBtn").style.display = "none";
-}
-
-function renderTagList(){
-  let list = document.getElementById("tagList");
-  list.innerHTML = "";
-  if(TAGS.length===0){
-    list.innerHTML = "<div class='empty-state'>Aucun tag pour le moment.</div>";
-    return;
-  }
-  TAGS.forEach(t=>{
-    let count = cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(t.id)).length;
-    let row = document.createElement("div");
-    row.className = "admin-row";
-    let swatch = document.createElement("div");
-    swatch.className = "ph";
-    swatch.style.background = t.hex;
-    swatch.textContent = t.emoji;
-    row.appendChild(swatch);
-    let info = document.createElement("div"); info.className = "info";
-    info.innerHTML = `<div class="n">${t.label}</div><div class="m">${count} carte${count>1?"s":""}</div>`;
-    row.appendChild(info);
-    let actions = document.createElement("div"); actions.className = "actions";
-    let editBtn = document.createElement("button");
-    editBtn.className = "icon-btn";
-    editBtn.textContent = "✏️";
-    editBtn.title = "Modifier le tag";
-    editBtn.addEventListener("click", ()=>editTag(t.id));
-    actions.appendChild(editBtn);
-    let delBtn = document.createElement("button");
-    delBtn.className = "icon-btn del";
-    delBtn.textContent = "🗑️";
-    delBtn.title = "Supprimer le tag";
-    delBtn.addEventListener("click", ()=>deleteTag(t.id));
-    actions.appendChild(delBtn);
-    row.appendChild(actions);
-    list.appendChild(row);
-  });
-}
-
-function editTag(id){
-  let t = tagInfo(id);
-  if(!t) return;
-  editingTagId = id;
-  document.getElementById("tf_label").value = t.label;
-  document.getElementById("tf_emoji").value = t.emoji;
-  document.getElementById("tf_color").value = t.hex;
-  document.getElementById("tf_submitBtn").textContent = "Modifier le tag";
-  document.getElementById("tf_cancelBtn").style.display = "inline-block";
-  document.getElementById("tagForm").scrollIntoView({behavior:"smooth", block:"start"});
-}
-document.getElementById("tf_cancelBtn").addEventListener("click", resetTagForm);
-
-document.getElementById("tagForm").addEventListener("submit", (e)=>{
-  e.preventDefault();
-  let label = document.getElementById("tf_label").value.trim();
-  if(!label){ toast("Entre un nom de tag."); return; }
-  let emoji = document.getElementById("tf_emoji").value.trim() || "🃏";
-  let hex = document.getElementById("tf_color").value || "#37cfff";
-
-  if(editingTagId !== null){
-    let t = tagInfo(editingTagId);
-    if(t){ t.label = label; t.emoji = emoji; t.hex = hex; }
-    saveTags();
-    resetTagForm();
-    renderTagList();
-    renderAdminCardTagsPicker();
-    renderAdminList();
-    renderBoosterTagRow();
-    renderCollectionTagRow();
-    renderCollection();
-    toast("✅ Tag modifié.");
-    return;
-  }
-
-  let id = slugifyTagId(label);
-  TAGS.push({ id, label, emoji, hex });
-  saveTags();
-  resetTagForm();
-  renderTagList();
-  renderAdminCardTagsPicker();
-  renderBoosterTagRow();
-  renderCollectionTagRow();
-  toast("✅ Tag ajouté.");
+document.getElementById("resetCooldownsBtn").addEventListener("click", ()=>{
+  lastClassicOpen = 0;
+  lastSpecializedOpen = 0;
+  localStorage.setItem(NS+"lastBoosterOpen", 0);
+  localStorage.setItem(NS+"lastSpecializedOpen", 0);
+  clearInterval(classicCooldownInterval);
+  clearInterval(specializedCooldownInterval);
+  document.getElementById("classicCooldownLabel").textContent = "";
+  document.getElementById("openClassicBtn").disabled = false;
+  document.getElementById("specializedCooldownLabel").textContent = "";
+  updateSpecializedCostLabel();
+  toast("✅ Cooldowns réinitialisés (test)");
 });
-
-function deleteTag(id){
-  let t = tagInfo(id);
-  if(!t) return;
-  let affectedCards = cardsDB.filter(c=> Array.isArray(c.tags) && c.tags.includes(id));
-  let msg = affectedCards.length > 0
-    ? `Supprimer le tag "${t.label}" ? Il sera retiré de ${affectedCards.length} carte(s), mais ces cartes ne seront PAS supprimées.`
-    : `Supprimer le tag "${t.label}" ?`;
-  if(!confirm(msg)) return;
-
-  cardsDB.forEach(c=>{
-    if(Array.isArray(c.tags)) c.tags = c.tags.filter(tg=>tg!==id);
-  });
-  TAGS = TAGS.filter(x=>x.id!==id);
-  selectedCardTags = selectedCardTags.filter(x=>x!==id);
-
-  saveCardsDB();
-  saveTags();
-
-  if(currentTag === id){
-    currentTag = TAGS[0] ? TAGS[0].id : null;
-    localStorage.setItem(NS+"currentSeries", currentTag || "");
-  }
-  if(collectionTagView === id){
-    collectionTagView = "all";
-    localStorage.setItem(NS+"collectionSeriesView", collectionTagView);
-  }
-  if(editingTagId === id) resetTagForm();
-
-  renderTagList();
-  renderAdminCardTagsPicker();
-  renderBoosterTagRow();
-  renderCollectionTagRow();
-  renderAdminList();
-  renderCollection();
-  renderShop();
-  toast("🗑️ Tag supprimé.");
-}
-
-/* =====================================================
-   ADMIN — CARD CRUD
-===================================================== */
-let pendingImage = null;
-
-function resetAdminForm(){
-  editingCardId = null;
-  document.getElementById("af_name").value = "";
-  document.getElementById("af_url").value = "";
-  document.getElementById("af_file").value = "";
-  selectedCardTags = [];
-  renderAdminCardTagsPicker();
-  pendingImage = null;
-  document.getElementById("af_preview").style.display = "none";
-  document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.remove("active"));
-  document.querySelector('.rarity-chip[data-r="1"]').classList.add("active");
-  document.getElementById("af_submitBtn").textContent = "Ajouter la carte";
-  document.getElementById("af_cancelBtn").style.display = "none";
-}
-
-document.querySelectorAll(".rarity-chip").forEach(chip=>{
-  chip.addEventListener("click", ()=>{
-    document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.remove("active"));
-    chip.classList.add("active");
-  });
-});
-document.querySelector('.rarity-chip[data-r="1"]').classList.add("active");
-
-function getSelectedRarity(){
-  let active = document.querySelector(".rarity-chip.active");
-  return active ? Number(active.dataset.r) : 1;
-}
-
-function compressImageFile(file, cb){
-  let reader = new FileReader();
-  reader.onload = function(e){
-    let img = new Image();
-    img.onload = function(){
-      let maxW = 420;
-      let scale = Math.min(1, maxW / img.width);
-      let w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-      let canvas = document.createElement("canvas");
-      canvas.width = w; canvas.height = h;
-      let ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, w, h);
-      cb(canvas.toDataURL("image/jpeg", 0.78));
-    };
-    img.onerror = function(){ cb(null); };
-    img.src = e.target.result;
-  };
-  reader.onerror = function(){ cb(null); };
-  reader.readAsDataURL(file);
-}
-
-document.getElementById("af_file").addEventListener("change", (e)=>{
-  let file = e.target.files[0];
-  if(!file) return;
-  compressImageFile(file, (dataUrl)=>{
-    pendingImage = dataUrl;
-    let prev = document.getElementById("af_preview");
-    prev.src = dataUrl;
-    prev.style.display = "block";
-  });
-});
-document.getElementById("af_url").addEventListener("input", (e)=>{
-  let url = e.target.value.trim();
-  if(url){
-    pendingImage = null;
-    let prev = document.getElementById("af_preview");
-    prev.src = url;
-    prev.style.display = "block";
-  }
-});
-
-document.getElementById("adminForm").addEventListener("submit", (e)=>{
-  e.preventDefault();
-  let name = document.getElementById("af_name").value.trim();
-  if(!name){ toast("Entre un nom de carte."); return; }
-  let tags = selectedCardTags.slice();
-  let rarity = getSelectedRarity();
-  let urlVal = document.getElementById("af_url").value.trim();
-  let image = pendingImage || (urlVal !== "" ? urlVal : null);
-
-  if(editingCardId !== null){
-    let card = findCard(editingCardId);
-    if(card){
-      card.name = name; card.tags = tags; card.rarity = rarity;
-      if(image !== null) card.image = image;
-    }
-    toast("✅ Carte modifiée.");
-  } else {
-    cardsDB.push({ id: nextCardId(), name, tags, rarity, image });
-    toast("✅ Carte ajoutée.");
-  }
-  saveCardsDB();
-  resetAdminForm();
-  renderAdminList();
-  renderTagList();
-  renderCollection();
-  renderShop();
-});
-
-document.getElementById("af_cancelBtn").addEventListener("click", resetAdminForm);
-
-function editCard(id){
-  let card = findCard(id);
-  if(!card) return;
-  editingCardId = id;
-  document.getElementById("af_name").value = card.name;
-  selectedCardTags = Array.isArray(card.tags) ? card.tags.slice() : [];
-  renderAdminCardTagsPicker();
-  document.querySelectorAll(".rarity-chip").forEach(c=>c.classList.toggle("active", Number(c.dataset.r)===card.rarity));
-  document.getElementById("af_url").value = "";
-  document.getElementById("af_file").value = "";
-  pendingImage = null;
-  let prev = document.getElementById("af_preview");
-  if(card.image){ prev.src = card.image; prev.style.display = "block"; } else { prev.style.display = "none"; }
-  document.getElementById("af_submitBtn").textContent = "Modifier la carte";
-  document.getElementById("af_cancelBtn").style.display = "inline-block";
-  document.getElementById("settings").scrollIntoView({behavior:"smooth", block:"start"});
-}
-
-function deleteCard(id){
-  let card = findCard(id);
-  if(!card) return;
-  if(!confirm("Supprimer définitivement \"" + card.name + "\" ?")) return;
-  cardsDB = cardsDB.filter(c=>c.id!==id);
-  delete collection[id];
-  saveCardsDB();
-  saveCollection();
-  if(editingCardId===id) resetAdminForm();
-  renderAdminList();
-  renderTagList();
-  renderCollection();
-  renderShop();
-  toast("🗑️ Carte supprimée.");
-}
-
-function renderAdminList(){
-  let list = document.getElementById("adminList");
-  list.innerHTML = "";
-  document.getElementById("adminCount").textContent = cardsDB.length;
+function renderTestCardSelect(){
+  let sel = document.getElementById("tt_cardSelect");
+  sel.innerHTML = "";
   if(cardsDB.length===0){
-    list.innerHTML = "<div class='empty-state'>Aucune carte pour le moment. Ajoute-en une !</div>";
+    sel.innerHTML = "<option>Aucune carte disponible</option>";
     return;
   }
-  let sorted = cardsDB.slice().sort((a,b)=> a.name.localeCompare(b.name));
-  sorted.forEach(card=>{
-    let row = document.createElement("div");
-    row.className = "admin-row";
-    if(card.image){
-      let img = document.createElement("img"); img.src = card.image; row.appendChild(img);
-    } else {
-      let ph = document.createElement("div"); ph.className="ph"; ph.textContent = cardPlaceholderEmoji(card); row.appendChild(ph);
-    }
-    let info = document.createElement("div"); info.className="info";
-    let tagBadges = (Array.isArray(card.tags) && card.tags.length)
-      ? card.tags.map(tid=>{
-          let t = tagInfo(tid);
-          return t ? `<span class="card-tag-badge" style="background:${t.hex};color:#0b0a14;">${t.emoji} ${t.label}</span>` : "";
-        }).join("")
-      : `<span class="card-tag-badge" style="background:rgba(255,255,255,0.08);color:var(--text-dim);">Sans tag</span>`;
-    info.innerHTML = `<div class="n">${card.name}</div><div class="m">${starsShort(card.rarity)} · ${RARITY_LABEL[card.rarity]}</div><div>${tagBadges}</div>`;
-    let actions = document.createElement("div"); actions.className="actions";
-    let editBtn = document.createElement("button"); editBtn.className="icon-btn"; editBtn.textContent="✏️";
-    editBtn.addEventListener("click", ()=>editCard(card.id));
-    let delBtn = document.createElement("button"); delBtn.className="icon-btn del"; delBtn.textContent="🗑️";
-    delBtn.addEventListener("click", ()=>deleteCard(card.id));
-    actions.appendChild(editBtn); actions.appendChild(delBtn);
-    row.appendChild(info); row.appendChild(actions);
-    list.appendChild(row);
+  cardsDB.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(card=>{
+    let opt = document.createElement("option");
+    opt.value = card.id;
+    opt.textContent = card.name + " (" + starsShort(card.rarity) + ")";
+    sel.appendChild(opt);
   });
 }
+document.getElementById("giveCardBtn").addEventListener("click", ()=>{
+  let id = Number(document.getElementById("tt_cardSelect").value);
+  let card = findCard(id);
+  if(!card){ toast("Aucune carte disponible."); return; }
+  if(!collection[id]) collection[id] = {copies:1};
+  else collection[id].copies = (collection[id].copies||0) + 1;
+  saveCollection();
+  renderCollection();
+  renderShop();
+  toast("✅ +1 " + card.name + " (test)");
+});
 
 document.getElementById("resetCollectionBtn").addEventListener("click", ()=>{
   if(!confirm("Réinitialiser toute ta collection, tes cristaux et tes pièces ?")) return;
