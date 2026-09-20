@@ -19,13 +19,13 @@
     --anime:#ff4d8d;
     --jv:#37cfff;
     --meme:#ffd23f;
-    --r1:#8b87a6;
-    --r2:#3ddc84;
-    --r3:#37b6ff;
-    --r4:#b06bff;
-    --r5:#ffb020;
-    --r6:#ff3b5c;
-    --r7:#00e5ff;
+    --r1:#7dd9a0;
+    --r2:#5fb8ea;
+    --r3:#a97cea;
+    --r4:#ea5cb0;
+    --r5:#ea8f2e;
+    --r6:#f0c419;
+    --r7:#fce93b;
     --gold:#ffd23f;
     --font-display:'Bungee', 'Arial Black', sans-serif;
     --font-body:'Space Grotesk', 'Segoe UI', sans-serif;
@@ -172,6 +172,7 @@
   }
   .card .cname{font-size:12px;font-weight:700;line-height:1.2;min-height:28px;}
   .card .cstars{font-size:11px;letter-spacing:1px;}
+  .rbadge{font-weight:800;letter-spacing:0.5px;}
   .card .ccopies{font-size:10.5px;color:var(--text-dim);}
   .card .cseries-tag{
     position:absolute;top:6px;left:6px;font-size:13px;
@@ -183,7 +184,7 @@
   .card.rarity-4{border-color:var(--r4);box-shadow:0 0 16px rgba(176,107,255,0.25);}
   .card.rarity-5{border-color:var(--r5);box-shadow:0 0 18px rgba(255,176,32,0.3);}
   .card.rarity-6{border-color:var(--r6);box-shadow:0 0 20px rgba(255,59,92,0.35);}
-  .card.rarity-7{border-color:var(--r7);box-shadow:0 0 24px rgba(0,229,255,0.4);}
+  .card.rarity-7{border-color:var(--r7);box-shadow:0 0 24px rgba(252,233,59,0.4);}
   .card.holo{position:relative;overflow:hidden;}
   .card.holo::after{
     content:"";position:absolute;inset:0;pointer-events:none;
@@ -366,13 +367,13 @@
         <h2>Ouvrir un booster</h2>
         <div class="drop-rates">
           <div class="title">Taux de drop</div>
-          <div class="row"><span>⭐ Commune</span><span>44.9%</span></div>
-          <div class="row"><span>⭐⭐ Peu commune</span><span>25%</span></div>
-          <div class="row"><span>⭐⭐⭐ Rare</span><span>15%</span></div>
-          <div class="row"><span>⭐⭐⭐⭐ Épique</span><span>10%</span></div>
-          <div class="row"><span>⭐⭐⭐⭐⭐ Légendaire</span><span>4%</span></div>
-          <div class="row"><span>⭐⭐⭐⭐⭐⭐ Secrète</span><span>1%</span></div>
-          <div class="row"><span>💎 Diamant</span><span>0.1%</span></div>
+          <div class="row"><span><span style="color:#7dd9a0;font-weight:800;">C</span> Commune</span><span>44.9%</span></div>
+          <div class="row"><span><span style="color:#5fb8ea;font-weight:800;">PC</span> Peu commune</span><span>25%</span></div>
+          <div class="row"><span><span style="color:#a97cea;font-weight:800;">R</span> Rare</span><span>15%</span></div>
+          <div class="row"><span><span style="color:#ea5cb0;font-weight:800;">SR</span> Super Rare</span><span>10%</span></div>
+          <div class="row"><span><span style="color:#ea8f2e;font-weight:800;">UR</span> Ultra Rare</span><span>4%</span></div>
+          <div class="row"><span><span style="color:#f0c419;font-weight:800;">L</span> Légendaire</span><span>1%</span></div>
+          <div class="row"><span><span style="color:#fce93b;font-weight:800;">S</span> Secrète</span><span>0.1%</span></div>
         </div>
 
         <div id="pityDisplay"></div>
@@ -530,7 +531,9 @@ const DEFAULT_TAGS = [
   { id:"meme",      label:"Meme",        emoji:"😂", hex:"#ffd23f" }
 ];
 /* @@DEFAULT_TAGS_END@@ */
-const RARITY_LABEL = {1:"Commune",2:"Peu commune",3:"Rare",4:"Épique",5:"Légendaire",6:"Secrète",7:"Diamant"};
+const RARITY_LABEL = {1:"Commune",2:"Peu commune",3:"Rare",4:"Super Rare",5:"Ultra Rare",6:"Légendaire",7:"Secrète"};
+const RARITY_CODE = {1:"C",2:"PC",3:"R",4:"SR",5:"UR",6:"L",7:"S"};
+const RARITY_COLOR_HEX = {1:"#7dd9a0",2:"#5fb8ea",3:"#a97cea",4:"#ea5cb0",5:"#ea8f2e",6:"#f0c419",7:"#fce93b"};
 const DROP_RATES = [
   {rarity:1,chance:44.9},{rarity:2,chance:25},{rarity:3,chance:15},
   {rarity:4,chance:10},{rarity:5,chance:4},{rarity:6,chance:1},{rarity:7,chance:0.1}
@@ -546,7 +549,7 @@ const PITY_THRESHOLD = 100;
 const DAILY_QUESTS = [
   {id:"open_booster", title:"Ouvre un booster", desc:"Ouvre un booster aujourd'hui", target:1, reward:20, tracker:"boostersOpened"},
   {id:"recycle", title:"Recycle un doublon", desc:"Recycle au moins un doublon", target:1, reward:15, tracker:"duplicatesRecycled"},
-  {id:"find_rare", title:"Trouve une carte rare", desc:"Obtiens une carte Rare (⭐⭐⭐) ou mieux", target:1, reward:25, tracker:"raresFound"}
+  {id:"find_rare", title:"Trouve une carte rare", desc:"Obtiens une carte Rare (R) ou mieux", target:1, reward:25, tracker:"raresFound"}
 ];
 
 /* @@DEFAULT_CARDS_START@@ */
@@ -702,8 +705,15 @@ function cardPlaceholderEmoji(card){
   }
   return "🃏";
 }
-function starsDisplay(rarity){ return rarity === 7 ? "💎 DIAMANT" : "⭐".repeat(rarity) + " " + RARITY_LABEL[rarity]; }
-function starsShort(rarity){ return rarity === 7 ? "💎" : "⭐".repeat(rarity); }
+function starsDisplay(rarity){ return RARITY_CODE[rarity] + " · " + RARITY_LABEL[rarity]; }
+function starsShort(rarity){ return RARITY_CODE[rarity] || "?"; }
+function rarityBadgeEl(rarity, extraClass){
+  let el = document.createElement("span");
+  el.className = "rbadge" + (extraClass ? " "+extraClass : "");
+  el.textContent = RARITY_CODE[rarity] || "?";
+  el.style.color = RARITY_COLOR_HEX[rarity] || "#8b87a6";
+  return el;
+}
 function nextCardId(){ return cardsDB.reduce((m,c)=>Math.max(m,c.id),0) + 1; }
 function findCard(id){ return cardsDB.find(c=>c.id===id); }
 function updateResourceDisplay(){
@@ -986,7 +996,10 @@ function renderBoosterReveal(pack){
     }
     back.appendChild(cardImageEl(card, "ph"));
     let n = document.createElement("div"); n.className="fname"; n.textContent = card.name; back.appendChild(n);
-    let s = document.createElement("div"); s.className="fstars"; s.textContent = starsShort(card.rarity) + " x" + (data?data.copies:1); back.appendChild(s);
+    let s = document.createElement("div"); s.className="fstars";
+    s.appendChild(rarityBadgeEl(card.rarity));
+    s.appendChild(document.createTextNode(" x" + (data?data.copies:1)));
+    back.appendChild(s);
   }
 
   function renderIndex(){
@@ -1035,7 +1048,7 @@ function renderBoosterReveal(pack){
         el.className = "card rarity-" + card.rarity + (card.rarity>=6 ? " holo" : "");
         el.appendChild(cardImageEl(card));
         let name = document.createElement("div"); name.className="cname"; name.textContent = card.name;
-        let star = document.createElement("div"); star.className="cstars"; star.textContent = starsShort(card.rarity);
+        let star = document.createElement("div"); star.className="cstars"; star.appendChild(rarityBadgeEl(card.rarity));
         el.appendChild(name); el.appendChild(star);
         grid.appendChild(el);
       });
@@ -1051,10 +1064,10 @@ function renderBoosterReveal(pack){
    EPIC OVERLAY (rarity 4+)
 ===================================================== */
 const EPIC_CFG = {
-  4:{label:"✦ ÉPIQUE ✦", color:"#b06bff", count:16},
-  5:{label:"★ LÉGENDAIRE ★", color:"#ffb020", count:26},
-  6:{label:"◈ SECRÈTE ◈", color:"#ff3b5c", count:40},
-  7:{label:"💎 DIAMANT 💎", color:"#00e5ff", count:60}
+  4:{label:"✦ SUPER RARE ✦", color:"#ea5cb0", count:16},
+  5:{label:"★ ULTRA RARE ★", color:"#ea8f2e", count:26},
+  6:{label:"◈ LÉGENDAIRE ◈", color:"#f0c419", count:40},
+  7:{label:"❂ SECRÈTE ❂", color:"#fce93b", count:60}
 };
 function playEpicOverlay(card, onDone){
   let cfg = EPIC_CFG[card.rarity];
@@ -1071,6 +1084,8 @@ function playEpicOverlay(card, onDone){
   label.style.textShadow = "0 0 24px "+cfg.color;
   nameEl.textContent = card.name;
   starsEl.textContent = starsShort(card.rarity);
+  starsEl.style.color = RARITY_COLOR_HEX[card.rarity] || cfg.color;
+  starsEl.style.fontWeight = "800";
   imgHolder.innerHTML = "";
   imgHolder.appendChild(cardImageEl(card));
   epicCard.style.background = "radial-gradient(circle, "+cfg.color+"33 0%, transparent 70%)";
@@ -1127,7 +1142,7 @@ function renderCollection(){
     el.appendChild(tag);
     el.appendChild(cardImageEl(card, data ? "" : "grayed"));
     let name = document.createElement("div"); name.className="cname"; name.textContent = data ? card.name : "???";
-    let star = document.createElement("div"); star.className="cstars"; star.textContent = starsShort(card.rarity);
+    let star = document.createElement("div"); star.className="cstars"; star.appendChild(rarityBadgeEl(card.rarity));
     el.appendChild(name); el.appendChild(star);
     if(data){
       let copies = document.createElement("div"); copies.className="ccopies"; copies.textContent = "x" + (data.copies||1);
@@ -1209,7 +1224,7 @@ function renderShop(){
     el.className = "missing-card";
     el.appendChild(cardImageEl(card));
     let n = document.createElement("div"); n.style.fontWeight="700"; n.style.fontSize="12px"; n.textContent = card.name;
-    let s = document.createElement("div"); s.className="cstars"; s.style.fontSize="11px"; s.textContent = starsShort(card.rarity);
+    let s = document.createElement("div"); s.className="cstars"; s.style.fontSize="11px"; s.appendChild(rarityBadgeEl(card.rarity));
     let p = document.createElement("div"); p.className="price"; p.textContent = cost + " 💎";
     let btn = document.createElement("button"); btn.className="btn small"; btn.style.width="100%"; btn.textContent="Acheter";
     btn.disabled = crystals < cost;
