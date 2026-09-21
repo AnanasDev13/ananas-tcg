@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ananas TCG Card Game</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -163,7 +166,6 @@
     border:1.5px solid var(--r1);text-align:center;
     display:flex;flex-direction:column;align-items:center;gap:5px;
   }
-  .card.locked{opacity:0.35;filter:grayscale(0.6);}
   .card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px;}
   .card-placeholder{
     width:100%;aspect-ratio:3/4;border-radius:9px;
@@ -185,6 +187,9 @@
   .card.rarity-5{border-color:var(--r5);box-shadow:0 0 18px rgba(255,176,32,0.3);}
   .card.rarity-6{border-color:var(--r6);box-shadow:0 0 20px rgba(255,59,92,0.35);}
   .card.rarity-7{border-color:var(--r7);box-shadow:0 0 24px rgba(252,233,59,0.4);}
+  .card.locked{opacity:1;border-color:rgba(255,255,255,0.14) !important;box-shadow:none !important;}
+  .card-placeholder.mystery{font-size:44px;font-weight:800;color:rgba(255,255,255,0.25);}
+  .card.locked .cstars{opacity:0.65;}
   .card.holo{position:relative;overflow:hidden;}
   .card.holo::after{
     content:"";position:absolute;inset:0;pointer-events:none;
@@ -501,6 +506,11 @@
     </section>
 
   </main>
+  <div style="text-align:center;font-size:10.5px;color:var(--text-dim);opacity:0.5;margin-top:6px;">Version <span id="siteVersionLabel"></span></div>
+</div>
+
+<div id="updateBanner" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:1001;background:linear-gradient(135deg,#ff4d8d,#37cfff);color:#0b0a14;padding:12px 18px;border-radius:14px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.4);text-align:center;">
+  🔄 Nouvelle version disponible — touche pour recharger
 </div>
 
 <div id="epicOverlay" class="epic-overlay">
@@ -524,6 +534,9 @@
    CONFIG
 ===================================================== */
 const NS = "anansTcg_";
+/* @@SITE_VERSION_START@@ */
+const SITE_VERSION = 8;
+/* @@SITE_VERSION_END@@ */
 /* @@DEFAULT_TAGS_START@@ */
 const DEFAULT_TAGS = [{"id":"anime","label":"Anime","emoji":"🍥","hex":"#ff4d8d"},{"id":"jeuxvideo","label":"Jeux Vidéo","emoji":"🎮","hex":"#37cfff"},{"id":"meme","label":"Meme","emoji":"😂","hex":"#ffd23f"},{"id":"personnage","label":"Personnage","emoji":"😀","hex":"#fff700"},{"id":"personne","label":"Personne","emoji":"🧒","hex":"#fff700"},{"id":"animaux","label":"Animaux","emoji":"🐶","hex":"#930606"},{"id":"manga","label":"Manga","emoji":"🍙","hex":"#ffffff"},{"id":"star","label":"Star","emoji":"⭐","hex":"#fff700"},{"id":"acteur","label":"Acteur","emoji":"🎭","hex":"#7d10ea"}];
 /* @@DEFAULT_TAGS_END@@ */
@@ -1106,9 +1119,14 @@ function renderCollection(){
     let data = collection[card.id];
     let el = document.createElement("div");
     el.className = "card rarity-" + card.rarity + (card.rarity>=6 && data ? " holo" : "") + (!data ? " locked" : "");
-    let tag = document.createElement("div"); tag.className="cseries-tag"; tag.textContent = cardPlaceholderEmoji(card);
+    let tag = document.createElement("div"); tag.className="cseries-tag"; tag.textContent = data ? cardPlaceholderEmoji(card) : "❓";
     el.appendChild(tag);
-    el.appendChild(cardImageEl(card, data ? "" : "grayed"));
+    if(data){
+      el.appendChild(cardImageEl(card));
+    } else {
+      let ph = document.createElement("div"); ph.className="card-placeholder mystery"; ph.textContent = "?";
+      el.appendChild(ph);
+    }
     let name = document.createElement("div"); name.className="cname"; name.textContent = data ? card.name : "???";
     let star = document.createElement("div"); star.className="cstars"; star.appendChild(rarityBadgeEl(card.rarity));
     el.appendChild(name); el.appendChild(star);
@@ -1347,6 +1365,41 @@ document.getElementById("resetCollectionBtn").addEventListener("click", ()=>{
   renderCollection(); renderShop();
   toast("🗑️ Collection réinitialisée.");
 });
+
+/* =====================================================
+   VERSION & CACHE CHECK
+   Le générateur (builder.html) incrémente SITE_VERSION à chaque
+   génération d'un nouveau index.html. Au chargement, on refait une
+   requête fraîche (sans cache) vers la page elle-même : si le numéro
+   de version qu'elle contient est plus récent que celui actuellement
+   affiché, c'est que le navigateur montre une version mise en cache —
+   on propose alors de recharger pour de vrai.
+===================================================== */
+document.getElementById("siteVersionLabel").textContent = SITE_VERSION;
+(function checkForNewerVersion(){
+  try{
+    let bustUrl = new URL(location.pathname, location.origin);
+    bustUrl.searchParams.set("_check", Date.now() + "-" + Math.random().toString(36).slice(2));
+    fetch(bustUrl.toString(), {cache:"no-store"})
+      .then(r => r.ok ? r.text() : null)
+      .then(text => {
+        if(!text) return;
+        let m = text.match(/const SITE_VERSION\s*=\s*(\d+)/);
+        if(!m) return;
+        let remoteVersion = Number(m[1]);
+        if(remoteVersion > SITE_VERSION){
+          let banner = document.getElementById("updateBanner");
+          banner.style.display = "block";
+          banner.addEventListener("click", ()=>{
+            let url = new URL(location.pathname, location.origin);
+            url.searchParams.set("_r", Date.now());
+            location.href = url.toString();
+          });
+        }
+      })
+      .catch(()=>{});
+  }catch(e){}
+})();
 
 /* =====================================================
    INIT
