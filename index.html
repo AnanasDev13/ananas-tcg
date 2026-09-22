@@ -503,8 +503,6 @@
         <div class="danger-zone">
           <h3 style="color:#ff8a9b;">⚠️ Zone dangereuse</h3>
           <button class="btn danger small" id="resetCollectionBtn">Réinitialiser la collection</button>
-          <button class="btn danger small" id="reloadCatalogBtn" type="button" style="margin-top:8px;">Recharger le catalogue depuis le code du site</button>
-          <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">À utiliser si ton navigateur affiche encore d'anciennes cartes après une mise à jour du site : ça remplace les tags et cartes stockés dans CE navigateur par ceux codés dans le fichier actuel.</p>
         </div>
         </div>
       </div>
@@ -540,7 +538,7 @@
 ===================================================== */
 const NS = "anansTcg_";
 /* @@SITE_VERSION_START@@ */
-const SITE_VERSION = 6;
+const SITE_VERSION = 7;
 /* @@SITE_VERSION_END@@ */
 /* @@DEFAULT_TAGS_START@@ */
 const DEFAULT_TAGS = [{"id":"anime","label":"Anime","emoji":"🍥","hex":"#ff4d8d"},{"id":"jeuxvideo","label":"Jeux Vidéo","emoji":"🎮","hex":"#37cfff"},{"id":"meme","label":"Meme","emoji":"😂","hex":"#ffd23f"},{"id":"animaux","label":"Animaux","emoji":"🐶","hex":"#be1313"},{"id":"personne","label":"Personne","emoji":"👦","hex":"#fff700"},{"id":"personnage","label":"Personnage","emoji":"😀","hex":"#fff700"},{"id":"acteur","label":"Acteur","emoji":"🎭","hex":"#d30909"},{"id":"star","label":"Star","emoji":"⭐","hex":"#fff738"},{"id":"memory","label":"Memory","emoji":"👁","hex":"#86cde4"},{"id":"creature","label":"Créature","emoji":"🐲","hex":"#caff38"}];
@@ -589,12 +587,14 @@ function saveJSON(key, value){
 // Le système est un système de TAGS : une carte peut porter zéro, un ou
 // plusieurs tags (contrairement à l'ancien système de types, où une carte
 // n'appartenait qu'à un seul type).
-let TAGS = loadJSON("series", null);
-if(TAGS === null || !Array.isArray(TAGS)){
-  TAGS = DEFAULT_TAGS.slice();
-  saveJSON("series", TAGS);
-}
-function saveTags(){ saveJSON("series", TAGS); }
+// Le catalogue (tags + cartes) est désormais toujours chargé directement
+// depuis le code du site (généré par builder.html), à chaque ouverture de
+// la page. Il n'est plus stocké ni protégé dans le navigateur : mettre à
+// jour le fichier public suffit, sans bouton ni manipulation supplémentaire.
+// Seules les données propres à chaque joueur (collection, cristaux, pièces,
+// quêtes, cooldowns) restent enregistrées localement.
+let TAGS = DEFAULT_TAGS.slice();
+function saveTags(){ /* plus de persistance : le catalogue vient toujours du code du site */ }
 function slugifyTagId(label){
   let base = label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/(^-+|-+$)/g,"");
   if(!base) base = "tag";
@@ -603,43 +603,7 @@ function slugifyTagId(label){
   return id;
 }
 
-// Les cartes et tags de l'utilisateur sont stockées dans le localStorage du
-// navigateur, séparément du code du site. Une mise à jour du site (nouveau
-// fichier publié) ne réinitialise JAMAIS ces données : on ne charge les
-// cartes par défaut que si la clé "cards" n'a encore JAMAIS été enregistrée
-// (première visite). Si l'utilisateur vide sa collection de cartes
-// volontairement, elle reste vide — elle n'est pas re-remplie automatiquement.
-let cardsDB = loadJSON("cards", null);
-if(cardsDB === null || !Array.isArray(cardsDB)){
-  cardsDB = DEFAULT_CARDS.slice();
-  saveJSON("cards", cardsDB);
-  // Première visite : les cartes par défaut sont déjà au bon format (avec ALT
-  // en rareté 7), donc pas besoin de la migration ALT ci-dessous.
-  localStorage.setItem(NS+"altMigrated", "1");
-} else {
-  // Migration : les anciennes cartes stockaient un seul "series" (string).
-  // On les convertit en tableau "tags" sans perdre l'information.
-  let migrated = false;
-  cardsDB.forEach(c=>{
-    if(!Array.isArray(c.tags)){
-      c.tags = (typeof c.series === "string" && c.series) ? [c.series] : [];
-      migrated = true;
-    }
-  });
-  if(migrated) saveJSON("cards", cardsDB);
-
-  // Migration (une seule fois) : l'ajout de la rareté ALT décale l'ancienne
-  // rareté 7 (Secrète/S) vers la position 8. On ne veut faire ce décalage
-  // qu'une seule fois, jamais sur une future carte ALT créée volontairement.
-  if(localStorage.getItem(NS+"altMigrated") !== "1"){
-    let rarityMigrated = false;
-    cardsDB.forEach(c=>{
-      if(c.rarity === 7){ c.rarity = 8; rarityMigrated = true; }
-    });
-    if(rarityMigrated) saveJSON("cards", cardsDB);
-    localStorage.setItem(NS+"altMigrated", "1");
-  }
-}
+let cardsDB = DEFAULT_CARDS.slice();
 let collection = loadJSON("collection", {});
 let crystals = Number(localStorage.getItem(NS+"crystals")) || 300;
 let pieces = Number(localStorage.getItem(NS+"pieces")) || 0;
@@ -662,7 +626,7 @@ let editingCardId = null;
 function saveCrystals(){ localStorage.setItem(NS+"crystals", crystals); }
 function savePieces(){ localStorage.setItem(NS+"pieces", pieces); }
 function saveCollection(){ saveJSON("collection", collection); }
-function saveCardsDB(){ saveJSON("cards", cardsDB); }
+function saveCardsDB(){ /* plus de persistance : le catalogue vient toujours du code du site */ }
 function savePity(){ localStorage.setItem(NS+"pityCounter", pityCounter); }
 
 function getTodayKey(){ return new Date().toISOString().slice(0,10); }
@@ -1385,20 +1349,6 @@ document.getElementById("resetCollectionBtn").addEventListener("click", ()=>{
   updateResourceDisplay(); updatePityDisplay();
   renderCollection(); renderShop();
   toast("🗑️ Collection réinitialisée.");
-});
-
-document.getElementById("reloadCatalogBtn").addEventListener("click", ()=>{
-  if(!confirm("Remplacer les tags et cartes stockés dans CE navigateur par ceux codés dans le fichier actuel du site ? Ta collection ne sera pas touchée, mais si des cartes ont changé d'identifiant, certaines entrées de ta collection pourraient ne plus correspondre à rien.")) return;
-  TAGS = DEFAULT_TAGS.slice();
-  cardsDB = DEFAULT_CARDS.slice();
-  saveTags();
-  saveCardsDB();
-  renderBoosterTagRow();
-  renderCollectionTagRow();
-  renderCollection();
-  renderShop();
-  renderTestCardSelect();
-  toast("✅ Catalogue rechargé depuis le code du site (" + TAGS.length + " tag(s), " + cardsDB.length + " carte(s)).");
 });
 
 /* =====================================================
